@@ -1,5 +1,5 @@
 {
-  "name": "game_name",
+  "name": "bgtest",
   "version": "0.0.1",
   "manifest": {
     "maxTick": 50,
@@ -24,13 +24,17 @@
         "preserveDrawingBuffer": false
       }
     },
-    "title": "Tsum Tsum"
+    "title": "bgtest",
+    "fbinstant": {
+      "url": "https://connect.facebook.net/en_US/fbinstant.6.1.js"
+    }
   },
   "scripts": {
     "postinstall": "git submodule update --init --recursive && (cd frontend && npm install)",
     "start": "npm run serve",
     "lint": "eslint src",
     "serve": "./frontend/node_modules/.bin/webpack-dev-server --env.buildType development --no-inline",
+    "build-rc0": "./frontend/node_modules/.bin/webpack --env.buildType RC0",
     "clean": "rm -rf build dist testResults deploy .cache",
     "clean-modules": "rm -rf node_modules"
   },

@@ -1,0 +1,22 @@
+export PLATFORM='fb'
+export OUTPUTDIR='build/release/browser-mobile-RC0'
+export IS_TEST='true'
+export NODE_ENV='production'
+export IMAGE_LOW_RES='false'
+
+export DEBUG_RESET='true'
+
+export ANALYTICS_CONFIG_KEY='dev'
+
+export FB_APP_ID='581027962299249'
+
+export FLATLINE_APP_ID='evertown-dev'
+export FLATLINE_HOST='https://wintermute-151001.appspot.com'
+
+export FREESIDE_APP_ID='evertown-dev'
+export FREESIDE_HOST='https://freeside-152323.appspot.com'
+
+export FB_INSTANT_USE_MOCK_DATA='false'
+export FB_VIDEO_ADS_PLACEMENT_ID=''
+
+export SOCIAL_MESSAGING_HOST='https://wintermute-151001.appspot.com'

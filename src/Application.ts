@@ -10,6 +10,7 @@ import { max, lerp, sqrt, rollInt, random, TAU, between, abs, sin, cos } from '.
 import { center, setValue } from './lib/GameHelpers';
 import PachinkoBall from './PachinkoBall';
 import Game from './Game';
+import platform from 'frontend/devkit-fbinstant/js';
 
 import {
   GAMEPLAY_HEIGHT,
@@ -138,6 +139,8 @@ export default class Application extends View {
 
     device.screen.on('Resize', () => this._resize());
     this._resize();
+
+    platform.startGameAsync();
   }
 
   generateGameData() {
