@@ -1,0 +1,17 @@
+{
+  "equipment": {
+    "types": [
+      "rod",
+      "reel",
+      "しかけ"
+    ]
+  },
+
+  "screenshotTypes": {
+    "SHARE_SCORE": {
+      "title": "",
+      "text": "Can you beat my score?",
+      "cta": "Play"
+    }
+  }
+}

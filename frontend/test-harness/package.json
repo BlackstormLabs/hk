@@ -1,0 +1,22 @@
+{
+  "name": "test-harness",
+  "version": "0.1.1",
+  "description": "Execute tests via command line against a build.",
+  "main": "./bin/test-harness.js",
+  "bin": {
+    "test-harness": "./bin/test-harness.js"
+  },
+  "author": "Aaron Parr",
+  "scripts": {
+    "test-harness": "node ./bin/test-harness.js"
+  },
+  "files": [
+    "bin/"
+  ],
+  "dependencies": {
+    "mocha": "^5.1.1",
+    "node-env-file": "^0.1.8",
+    "selenium": "^2.20.0",
+    "selenium-webdriver": "^4.0.0-alpha.1"
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "name": "templateGame",
+  "version": "1.0.0",
+  "description": "",
+  "manifest": {
+    "analytics": {
+      "prod": {
+        "amplitude": {
+          "blacklist": [
+            "PlatformInitSuccess",
+            "session",
+            "ServerConnected",
+            "SuccessfulStart",
+            "SocialServerSuccess",
+            "characterEquip",
+            "sidekickEquip",
+            "settingsChange",
+            "inputSpeedChange",
+            "resolutionChange",
+            "VisibilityChange"
+          ],
+          "key": "6d6d033b2cd6318fx6970c502e5dca07d"
+        },
+        "keen": {
+          "projectID": "57d0b4528dxb53dfda8a6f107",
+          "whitelist": [
+            "FirstEntry"
+          ],
+          "writeKey": "508ECFE5013x6F32598ABB43E0E388137CE4E27E6F51A98743FFF59C562C46567609E8C5FC6E9D79408F5FEE3B9B314AE915C12EFA9AED4EF31556B8F0E656B3692CA55CE615EF733210ACB18C0D4AFCAE7CC44CA80F455332A69D985BF7AF56E"
+        },
+        "pixel": {
+          "enabled": true,
+          "whitelist": [
+            "FirstEntry",
+            "device-install",
+            "tutorialStepStart",
+            "tutorialStepComplete"
+          ]
+        }
+      }
+    },
+    "android": {
+      "enableLowRes": false,
+      "icons": {
+        "1024": "resources/icons/1024.png"
+      },
+      "webGL": {
+        "maxTextureMegabytes": 80
+      }
+    },
+    "appID": "50780c5ed0x5d4d14b3bff91dcd8f343f",
+    "browser": {
+      "canvas": {
+        "embedSplash": false,
+        "height": 1024,
+        "useWebGL": true,
+        "width": 576
+      },
+      "disableServiceWorkers": true,
+      "maxTick": 50,
+      "openGraph": {
+        "description": "Just wing it!",
+        "image": "http://www.weeby.co/kittyninja/fvm/banner.png",
+        "title": "templateGame",
+        "type": "game",
+        "url": "http://www.weeby.co/kittyninja/fvm/"
+      },
+      "webGL": {
+        "maxTextureMegabytes": 128,
+        "preserveDrawingBuffer": false
+      }
+    },
+    "fbinstant": {
+      "url": "https://connect.facebook.net/en_US/fbinstant.4.1-private.js"
+    },
+    "icon": "resources/icons/1024.png",
+    "ios": {
+      "appleID": "67439x7449",
+      "bundleID": "by.wee.templateGame",
+      "enableLowRes": false,
+      "icons": {
+        "1024": "resources/icons/1024.png"
+      }
+    },
+    "shortName": "templateGame",
+    "splash": {
+      "autoHide": true,
+      "universal": "resources/splash/splash.png"
+    },
+    "studio": {
+      "domain": "blackstormlabs.com",
+      "name": "Blackstorm Labs"
+    },
+    "supportedOrientations": [
+      "portrait"
+    ],
+    "title": "templateGame",
+    "version": "5.9.8"
+  },
+  "scripts": {
+    "postinstall": "git submodule update --init --recursive && (cd frontend && npm install)",
+    "start": "npm run serve",
+    "serve": "./node_modules/.bin/webpack-dev-server --env.buildType development --no-inline",
+    "serveFacebook": "./node_modules/.bin/webpack-dev-server --env.buildType developmentFacebook --no-inline",
+    "build": "webpack --env.buildType production",
+    "build-dev": "webpack --env.buildType development",
+    "build-rc0": "webpack --env.buildType RC0",
+    "build-rc1": "webpack --env.buildType RC1",
+    "build-rc2": "webpack --env.buildType RC2",
+    "build-cs": "webpack --env.buildType CS",
+    "build:rsync": "bash scripts/rsyncSpritesheets.sh",
+    "build:zip": "bash scripts/zip.sh",
+    "lint": "eslint src",
+    "clean": "rm -rf build dist testResults deploy .cache tools/graphicsConversionTools/cache/*",
+    "clean-modules": "rm -rf node_modules",
+    "clean-install": "npm run clean && npm run clean-modules && npm install",
+    "ledgerTests-run": "node ledgerTests/dist/testEntry.js",
+    "ledgerTests-clean": "rm -rf ledgerTests/dist",
+    "gcf-watch": "webpack --env.buildType development --env.GCF true --watch",
+    "gcf-build": "webpack --env.buildType production --env.GCF true",
+    "gcf-build-rc0": "webpack --env.buildType RC0 --env.GCF true",
+    "gcf-build-rc1": "webpack --env.buildType RC1 --env.GCF true",
+    "gcf-build-rc2": "webpack --env.buildType RC2 --env.GCF true",
+    "gcf-deploy": ". envs/production && gcf-deploy gcfAndWintermute",
+    "gcf-deploy-rc0": ". envs/RC0 && gcf-deploy gcfAndWintermute",
+    "gcf-deploy-rc1": ". envs/RC1 && gcf-deploy gcfAndWintermute",
+    "gcf-deploy-rc2": ". envs/RC2 && gcf-deploy gcfAndWintermute",
+    "gcf-dev1": "DEBUG=flatline*,ledger* DEBUG_DATA='gcfDevEvent/renderQuests.json' node dist/serverIndex.js",
+    "gcf-dev2": "DEBUG=flatline*,ledger* DEBUG_DATA='gcfDevEvent/startQuest.json' node dist/serverIndex.js",
+    "gcf-dev3": "DEBUG=flatline*,ledger* DEBUG_DATA='gcfDevEvent/claimQuest.json' node dist/serverIndex.js",
+    "gcf-dev4": "DEBUG=flatline*,Ledger*,ledger* DEBUG_DATA='gcfDevEvent/bossEnergy.json' node dist/serverIndex.js",
+    "gcf-dev5": "DEBUG=flatline*,ledger* DEBUG_LOG_V3_STATE='true' node dist/serverIndex.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blackstormlabs/templateGame.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blackstormlabs/templateGame/issues"
+  },
+  "homepage": "https://github.com/blackstormlabs/templateGame#readme",
+  "dependencies": {
+    "amplitude-js": "^3.7.0",
+    "axios": "^0.16.2",
+    "bluebird": "^3.5.0",
+    "chalk": "^2.3.0",
+    "colors": "^1.1.2",
+    "debug": "^3.1.0",
+    "deep-freeze": "0.0.1",
+    "flat": "^4.0.0",
+    "json-stable-stringify": "^1.0.1",
+    "lazy-cache": "^2.0.2",
+    "lodash": "^4.17.4",
+    "lru-cache": "^4.1.1",
+    "lz-string": "^1.4.4",
+    "md5": "^2.2.1",
+    "parse-ms": "^1.0.1",
+    "seedrandom": "^2.4.3",
+    "smf-deep-diff": "^0.3.4",
+    "spdy": "^3.4.7",
+    "tempfile": "^2.0.0"
+  },
+  "devDependencies": {
+    "@blackstormlabs/gcf-deploy": "=5.1.1",
+    "@google-cloud/storage": "^1.2.1",
+    "canvas-prebuilt": "^1.6.5-prerelease.1",
+    "dnscache": "^1.0.1",
+    "jimp": "^0.2.28",
+    "md5-file": "^3.2.2",
+    "node-persist": "^2.1.0",
+    "pngquant": "^1.3.0",
+    "standard": "^10.0.3"
+  },
+  "gcfDeploy": {
+    "extraDependencies": {
+      "@google-cloud/storage": "^1.2.1",
+      "canvas-prebuilt": "=1.6.0",
+      "jimp": "^0.2.27",
+      "node-persist": "^2.1.0",
+      "md5-file": "^3.1.1",
+      "uuid": "^3.0.1",
+      "pngquant": "^1.2.0",
+      "spdy": "^3.4.7",
+      "dnscache": "^1.0.1"
+    },
+    "excludeDirs": [
+      "frontend/arson/graphicsConversionTools",
+      "resources"
+    ],
+    "cliConfig": {
+      "templateGame": {
+        "deployCmd": {
+          "mainFile": "dist/serverIndex.js",
+          "name": "scc-gcf_templateGame_[hash]",
+          "triggerType": "HTTP",
+          "entryPoint": "handleHttp",
+          "timeout": "30s",
+          "runGcloud": true
+        },
+        "uploadClientSchema": {
+          "clientSchemaPath": "dist/clientSchema.js"
+        }
+      },
+      "templateGame-rc0": {
+        "deployCmd": {
+          "mainFile": "dist/serverIndex.js",
+          "name": "scc-gcf_templateGame-rc0_[hash]",
+          "triggerType": "HTTP",
+          "entryPoint": "handleHttp",
+          "timeout": "30s",
+          "runGcloud": true
+        },
+        "uploadClientSchema": {
+          "clientSchemaPath": "dist/clientSchema.js"
+        }
+      },
+      "templateGame-rc1": {
+        "deployCmd": {
+          "mainFile": "dist/serverIndex.js",
+          "name": "scc-gcf_templateGame-rc1_[hash]",
+          "triggerType": "HTTP",
+          "entryPoint": "handleHttp",
+          "timeout": "30s",
+          "runGcloud": true
+        },
+        "uploadClientSchema": {
+          "clientSchemaPath": "dist/clientSchema.js"
+        }
+      },
+      "templateGame-rc2": {
+        "deployCmd": {
+          "mainFile": "dist/serverIndex.js",
+          "name": "scc-gcf_templateGame-rc2_[hash]",
+          "triggerType": "HTTP",
+          "entryPoint": "handleHttp",
+          "timeout": "30s",
+          "runGcloud": true
+        },
+        "uploadClientSchema": {
+          "clientSchemaPath": "dist/clientSchema.js"
+        }
+      }
+    }
+  }
+}

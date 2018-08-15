@@ -1,0 +1,27 @@
+{
+  "instant_games": {
+    "custom_update_templates": {
+      "SCREENSHOT_SEND_HEART": {
+        "example": "{name} send you a heart in TsumTsum"
+      },
+      "SCREENSHOT_BEST_SCORE": {
+        "example": "{name} set a new personal best in TsumTsum"
+      },
+      "SCREENSHOT_WEEKLY_CHAMPION": {
+        "example": "{name} was last week's champ in TsumTsum"
+      },
+      "SCREENSHOT_FRIEND_PASSED": {
+        "example": "{name} passed {friend} in TsumTsum"
+      },
+      "SCREENSHOT_NEW_HIGH_SCORE": {
+        "example": "{name} is first place in TsumTsum"
+      },
+      "SCREENSHOT_SHARE_SCORE": {
+        "example": "Can you beat my score in TsumTsum?"
+      },
+      "SCREENSHOT_MISCELLANEOUS": {
+        "example": "⚡ 😎 ⚡ 😎 ⚡"
+      }
+    }
+  }
+}

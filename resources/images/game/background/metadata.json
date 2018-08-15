@@ -1,0 +1,14 @@
+{
+  "sprite": false,
+  "package": true,
+  "rules": [{
+      "cond-fileList": [
+        "background.jpg"
+      ],
+	  "compress": {
+	    "format": "jpeg",
+	    "quality": 33
+	  }
+  }]
+
+}

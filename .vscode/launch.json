@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch BG Demo",
+      "url": "https://localhost:8020/webpack-dev-server/",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "runtimeArgs": [
+        "--auto-open-devtools-for-tabs",
+      ],
+      "sourceMapPathOverrides": {
+        "webpack:///*": "${webRoot}/*"
+      },
+      "disableNetworkCache": true
+    }
+  ]
+}

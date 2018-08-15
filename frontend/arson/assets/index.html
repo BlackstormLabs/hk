@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>{{manifest.title}}</title>
+    <meta property="og:title" content="{{manifest.browser.openGraph.title}}" />
+    <meta property="og:description" content="{{manifest.browser.openGraph.description}}" />
+    <meta property="og:type" content="{{manifest.browser.openGraph.type}}" />
+    <meta property="og:image" content="{{manifest.browser.openGraph.image}}" />
+    <meta property="og:url" content="{{manifest.browser.openGraph.url}}" />
+    <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,shrink-to-fit=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+
+    <link rel="apple-touch-icon" href="{{manifest.icon}}">
+
+    <style>body,html{height:100%;background:#000}body,fieldset,form,html,legend,li,ol,ul{margin:0;padding:0}div{box-sizing:border-box}h1,h2,h3,h4,h5,h6,p{margin-top:0}fieldset,img{border:0}legend{color:#000}li{list-style:none}sup{vertical-align:text-top}sub{vertical-align:text-bottom}table{border-collapse:collapse;border-spacing:0}caption,td,th{text-align:left;vertical-align:top;font-weight:400}input,select,textarea{font-size:110%;line-height:1.1}abbr,acronym{border-bottom:.1em dotted;cursor:help}body{font-family:Helvetica,Tahoma;-webkit-overflow-scrolling:touch;touch-action:none}body,div,span{tap-highlight-color:rgba(0,0,0,0);user-select:none}
+    </style>
+
+    <!-- Facebook Instant Games -->
+    <script src="{{manifest.fbinstant.url}}"></script>
+
+    <!-- Facebook Pixel -->
+    <script>
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+      document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '{{analytics.pixel.id}}'); // Insert your pixel ID here.
+      fbq('track', 'PageView');
+    </script>
+    <noscript>
+      <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id={{analytics.pixel.id}}&ev=PageView&noscript=1"/>
+    </noscript>
+
+    <!-- Devkit Globals -->
+    <script>
+      ;(function() {
+        var w=window;
+        w.BUILD_TARGET="browser-mobile";
+        w.BUILD_ENV="browser";
+        w.DEBUG=false;
+        w.APP_NAME="{{name}}";
+        w.APP_VERSION="{{version}}";
+        w.CONFIG={{{manifestString}}};
+        w.CONFIG.version=w.APP_VERSION;
+        {{#if simulated}}
+          w.CONFIG.simulator = true;
+        {{/if}}
+      })();
+    </script>
+
+    <link rel="manifest" href="web-app-manifest.json">
+
+    <script src="./devkit_modules.chunk.js"></script>
+
+    <script src="./bootstrap.js"></script>
+  </head>
+
+  <body></body>
+
+  <script>
+    initGC('./browser-mobile.js');
+  </script>
+</html>

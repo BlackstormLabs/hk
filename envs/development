@@ -1,0 +1,17 @@
+NODE_ENV=development
+SIMULATED=true
+#SCC_RUN_SERVER_FUNCTIONS_LOCALLY=true
+
+FLATLINE_APP_ID=tsumtsum-dev
+FLATLINE_HOST=https://deferred-actions-a4365e9-dot-wintermute-151001.appspot.com
+FLATLINE_USE_V2_SESSION=true
+FLATLINE_ADMIN_TOKEN=tsumtsum_5601879890534
+
+FREESIDE_HOST=https://onions.science
+FREESIDE_CONTEXT_STORAGE_HOST=https://context-storage-dot-freeside-152323.appspot.com
+
+SOCIAL_MESSAGING_HOST=https://sms-dot-wintermute-151001.appspot.com
+
+FB_INSTANT_USE_MOCK_DATA=true
+FB_INSTANT_MOCK_SIGNATURE=b67607cb5ecba55fbcc3c72771ebf9df
+#FB_VIDEO_ADS_PLACEMENT_ID=''

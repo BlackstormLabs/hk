@@ -1,0 +1,13 @@
+{
+  "group": "fonts-latin",
+  "scale": 0.85,
+  "rules": [
+    {
+      "cond-fileList": [
+      	"flashy_numbers.png"
+      ],
+      "scale": 0.75,
+      "group": "overlay_fonts"
+    }
+  ]
+}

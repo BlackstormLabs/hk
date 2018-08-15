@@ -1,0 +1,13 @@
+//paths
+path=build/release/browser-mobile/
+path=build/release/browser-mobile-RC0/
+path=build/release/browser-mobile-RC1/
+path=build/release/browser-mobile-RC2/
+//to build debug, you need to turn off source maps... see obscuration.md
+path=build/debug/browser-mobile/
+
+//options
+//true or false for the first two. whitelist or blacklist for type
+mvcMangle=false
+functionMangle=false
+type=blacklist

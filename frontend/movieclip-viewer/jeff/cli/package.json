@@ -1,0 +1,25 @@
+{
+	"name": "jeff-cli",
+	"description": "CLI for JEFF",
+	"version": "0.1.0",
+	"private": false,
+	"author": {
+		"name": "Brice Chevalier"
+	},
+	"main": "jeff",
+	"dependencies": {
+		"canvas-prebuilt": "1.6.5-prerelease.1",
+		"commander": "2.11.0",
+		"jeff": "0.4.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Wizcorp/jeff.git"
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/Wizcorp/jeff/blob/master/LICENSE"
+		}
+	]
+}

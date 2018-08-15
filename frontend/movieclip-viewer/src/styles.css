@@ -1,0 +1,327 @@
+body {
+  font-family: verdana;
+  font-size: 12px;
+  background-color: #ddd;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 1px;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+/*************************/
+/*    Animation menu     */
+/*************************/
+
+.animationMenu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 6px;
+  /*background-color: #bbb;*/
+  /*box-shadow: 1px 1px 5px #333;*/
+  z-index: 2;
+  padding: 2px;
+  width: 129px;
+  /*border-radius: 4px;*/
+  transform-origin: left top;
+  -ms-transform-origin: left top;
+  -webkit-transform-origin: left top;
+}
+
+.animationHeader {
+  background-color: #88b;
+  color: #fff;
+  height: 20px;
+  width: 100%;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 20px;
+  font-weight: bold;
+  font-size: 8px;
+  /*border-radius: 2px;*/
+}
+
+.animationList {
+  display: inline-block;
+  text-align: center;
+  margin-top: 5px;
+  /*background-color: #bbb;*/
+  width: 100%;
+  height: 260px;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+.animationItem {
+  padding: 2px 0px;
+  width: 96%;
+  box-shadow: 1px 1px 5px #333;
+  margin: 2px;
+  cursor: pointer;
+  overflow: hidden;
+  /*border-radius: 4px;*/
+}
+
+.animationFolder {
+  background-color: #88b;
+  color: #fff;
+  font-weight: bold;
+}
+
+.animation {
+  background-color: #ddf;
+}
+
+.animation:hover {
+  background-color: #ff2;
+}
+
+.animationSelected {
+  background-color: #bbe;
+}
+
+.animationSelected:hover {
+  background-color: #dd2;
+}
+
+.animationCentering {
+  padding: 2px 0px;
+  width: 100%;
+  display: inline-block;
+  background-color: #88b;
+  text-align: center;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.animationCentering:hover {
+  padding: 2px 0px;
+  width: 100%;
+  display: inline-block;
+  background-color: #dd2;
+  text-align: center;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/*************************/
+/*       File menu       */
+/*************************/
+
+.fileMenu {
+  display: inline-block;
+  padding: 5px;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 1;
+  max-height: 194px;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+.fileItem {
+  margin-left: 3px;
+  padding: 2px 4px;
+  box-shadow: 1px 1px 5px #333;
+  margin: 2px;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.fileName {
+  background-color: #ddf;
+  width: 326px;
+}
+
+.fileActive {
+  background-color: #222;
+  font-weight: bold;
+  margin-left: 5px;
+  width: 30px;
+  color: #fff;
+  text-align: center;
+}
+
+.fileInactive {
+  background-color: #ccc;
+  font-weight: bold;
+  margin-left: 5px;
+  width: 30px;
+  color: #000;
+  text-align: center;
+}
+
+.removeFile {
+  background-color: #c99;
+  font-weight: bold;
+  margin-left: 5px;
+  color: #fff;
+}
+
+/*************************/
+/*     Options menu      */
+/*************************/
+
+.dropArea {
+  border-radius: 10px;
+  border: dashed 4px #848484;
+  color: #848484;
+  font-size: 25px;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  width: 492px;
+  height: 590px;
+  margin: 5px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #ccc,
+    #ccc 10px,
+    rgba(0,0,0,0) 10px,
+    rgba(0,0,0,0) 20px
+  );
+  z-index: 0;
+}
+
+.outputOptions {
+  padding: 15px;
+}
+
+.outputDirectoryCaption {
+  color: #666;
+}
+
+.outputDirectory {
+  border: solid 1px #666;
+  border-radius: 4px;
+  background-color: #eee;
+  overflow-x: scroll;
+  white-space: nowrap;
+  padding: 3px;
+}
+
+.outputDirectory:hover {
+  border: solid 1px #666;
+  border-radius: 4px;
+  background-color: #ee4;
+  color: #000;
+  overflow-x: scroll;
+  white-space: nowrap;
+  padding: 3px;
+}
+
+.saveButton {
+  border-radius: 5px;
+  background-color: #cccac6;
+  color: #000;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.saveButton:hover {
+  border-radius: 5px;
+  background-color: #ee4;
+  color: #000;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.clearButton {
+  border-radius: 5px;
+  background-color: #c99;
+  text-align: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.clearButton:hover {
+  border-radius: 5px;
+  background-color: #ee4;
+  color: #000;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.jeffOptions {
+  display: inline-block;
+  vertical-align: top;
+  margin: 15px;
+  width: 464px;
+}
+
+.jeffOption {
+  border-radius: 5px;
+  margin-bottom: 3px;
+  box-shadow: 1px 1px 5px #333;
+  background-color: #ddf;
+}
+
+.jeffOption-title {
+  display: inline-block;
+  vertical-align: middle;
+  width: 108px;
+  margin: 3px;
+}
+
+.jeffOption-container {
+  display: inline-block;
+  vertical-align: middle;
+  width: 50px;
+}
+
+.jeffOption-description {
+  display: inline-block;
+  vertical-align: middle;
+  width: 300px;
+  overflow: hidden;
+  color: #888377;
+  white-space: nowrap;
+}
+
+.checkbox {
+  vertical-align: middle;
+  border: 4px solid #88a;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3) inset;
+}
+
+.dropdown {
+  vertical-align: middle;
+  width: 70px;
+  margin-left: -23px;
+}
+
+.numberInput {
+  vertical-align: middle;
+  width: 42px;
+}
+

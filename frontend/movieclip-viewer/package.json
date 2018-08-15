@@ -1,0 +1,45 @@
+{
+  "name": "movieclip-viewer",
+  "productName": "MovieClip Viewer",
+  "description": "Viewer for Flash animations converted with JEFF and running on timestep",
+  "version": "0.1.0",
+  "main": "main.js",
+  "author": "Blackstorm Labs",
+  "dependencies": {
+    "async": "0.2.10",
+    "buffer-crc32": "^0.2.5",
+    "canvas-prebuilt": "1.6.5-prerelease.1",
+    "commander": "^2.11.0",
+    "fs-extra": "0.8.1",
+    "glob": "4.3.1",
+    "js-beautify": "1.4.2",
+    "electron-context-menu": "0.9.1"
+  },
+  "devDependencies": {
+    "electron": "1.7.9",
+    "electron-installer-debian": "0.6.0",
+    "electron-installer-dmg": "0.1.2",
+    "electron-packager": "8.7.2",
+    "electron-rebuild": "1.6.0",
+    "electron-winstaller": "2.4.1",
+
+    "webpack": "3.7.1",
+    "ifdef-loader": "2.0.1",
+    "unlazy-loader": "0.1.2",
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.2",
+    "babel-preset-es2015": "6.24.1"
+  },
+  "scripts": {
+    "test": "webpack && electron .",
+    "package-mac": "electron-packager . --overwrite --asar=true --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds --ignore=\"(test|jeff\/test|release-builds|installers|user-manual)\"",
+    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --ignore=\"(test|jeff\/test|release-builds|installers|user-manual)\" --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Viewer for Flash animations converted with JEFF and running on timestep\"",
+    "package-linux": "electron-packager . MovieClip\\ Viewer --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds --ignore=\"(test|jeff\/test|release-builds|installers|user-manual)\"",
+    "create-installer-mac": "electron-installer-dmg ./release-builds/MovieClip\\ Viewer-darwin-x64/MovieClip\\ Viewer.app movieclip-viewer --out=installers --overwrite --icon=assets/icons/mac/icon.icns",
+    "create-installer-win": "node install-configs/createWindowsInstaller.js",
+    "create-debian-installer": "electron-installer-debian --src release-builds/MovieClip\\ Viewer-linux-x64/ --arch amd64 --config install-configs/debian.json",
+    "package": "npm run package-mac && npm run package-win && npm run package-linux",
+    "create-installers": "npm run create-installer-mac && npm run create-installer-win && npm run create-debian-installer",
+    "release": "npm run package && npm run create-installers"
+  }
+}

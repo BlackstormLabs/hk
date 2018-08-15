@@ -1,0 +1,40 @@
+{
+  "name": "game_name",
+  "version": "0.0.1",
+  "manifest": {
+    "maxTick": 50,
+    "android": {
+      "enableLowRes": false,
+      "webGL": {
+        "maxTextureMegabytes": 80
+      }
+    },
+    "ios": {
+      "enableLowRes": false,
+      "webGL": {
+        "maxTextureMegabytes": 80
+      }
+    },
+    "browser": {
+      "canvas": {
+        "useWebGL": true
+      },
+      "webGL": {
+        "maxTextureMegabytes": 128,
+        "preserveDrawingBuffer": false
+      }
+    },
+    "title": "Tsum Tsum"
+  },
+  "scripts": {
+    "postinstall": "git submodule update --init --recursive && (cd frontend && npm install)",
+    "start": "npm run serve",
+    "lint": "eslint src",
+    "serve": "./frontend/node_modules/.bin/webpack-dev-server --env.buildType development --no-inline",
+    "clean": "rm -rf build dist testResults deploy .cache",
+    "clean-modules": "rm -rf node_modules"
+  },
+  "author": "Game Closure",
+  "license": "ISC",
+  "devDependencies": {}
+}

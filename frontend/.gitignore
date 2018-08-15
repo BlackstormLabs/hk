@@ -1,0 +1,13 @@
+movieclip-viewer/test
+movieclip-viewer/node_modules
+movieclip-viewer/js-builds
+movieclip-viewer/release-builds
+movieclip-viewer/installers
+movieclip-viewer/jeff/.git
+movieclip-viewer/jeff/.gitignore
+movieclip-viewer/jeff/test
+arson/graphicsConversionTools/cache
+.DS_Store
+.vscode
+node_modules
+package-lock.json

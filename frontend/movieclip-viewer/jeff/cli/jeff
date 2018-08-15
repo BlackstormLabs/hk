@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+var jeff = require('../src/index.js');
+var parseArguments = require('./parseArguments.js');
+
+var Canvas = require('canvas-prebuilt');
+var Image = Canvas.Image;
+function getCanvas (w, h) {
+	if (w === null || w === undefined) { w = 300; }
+	if (h === null || h === undefined) { h = 150; }
+	return new Canvas(w, h);
+}
+
+// Creating a new Jeff
+jeff(parseArguments(process.argv), null, getCanvas, Image);
+// Waving Jeff good bye

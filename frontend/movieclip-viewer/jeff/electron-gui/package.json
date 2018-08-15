@@ -1,0 +1,30 @@
+{
+	"name": "jeff",
+	"description": "Electron GUI for JEFF",
+	"version": "0.1.0",
+	"private": false,
+	"author": {
+		"name": "Brice Chevalier",
+		"email": "bchevalier@wizcorp.jp"
+	},
+	"main": "main.js",
+	"scripts": {
+		"start": "electron ."
+	},
+	"dependencies": {
+		"jeff": "0.4.0"
+	},
+	"devDependencies": {
+		"electron": "^1.4.1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Wizcorp/jeff.git"
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/Wizcorp/jeff/blob/master/LICENSE"
+		}
+	]
+}
