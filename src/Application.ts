@@ -6,7 +6,7 @@ import animate from 'frontend/devkit-core/timestep/src/animate';
 import device from 'frontend/devkit-core/timestep/src/device';
 import ImageView from 'frontend/devkit-core/timestep/src/ui/ImageView';
 import View from 'frontend/devkit-core/timestep/src/ui/View';
-import { max, lerp, sqrt, rollInt, random, TAU, between, abs, sin, cos } from './lib/MathHelpers';
+import { max, lerp, sqrt, rollInt, random, TAU, between, sin, cos } from './lib/MathHelpers';
 import { center, setValue } from './lib/GameHelpers';
 import PachinkoBall from './PachinkoBall';
 import Game from './Game';
@@ -49,6 +49,8 @@ const OBJECT_WIDTH = 80;
 const LINE_HEIGHT = OBJECT_WIDTH / 2 * sqrt(3);
 const IMAGE_SCALE = .225;
 const TRIANGLE_SCALE = IMAGE_SCALE * 1.4;
+const KITTY_SCALE = 1.2;
+const TIGER_SCALE = 1.2;
 const TRIANGLE_CENTER = 4 / 12 * sqrt(3);
 const BALL_DIAMETER = 24;
 const BALL_RADIUS = BALL_DIAMETER / 2;
@@ -56,6 +58,9 @@ const ObjectImages = [
   'resources/images/game/objects/square.png',
   'resources/images/game/objects/circle.png',
   'resources/images/game/objects/triangle.png',
+  'resources/images/game/objects/kitty.png',
+  'resources/images/game/objects/panda.png',
+  'resources/images/game/objects/tiger.png'
 ];
 const TRIANGLE_POINTS = [
   { x: 0 - 23.37, y: 0 - 40.32 },
@@ -68,6 +73,7 @@ const SQUARE_POINTS = [
   { x: -28.8, y: 28.8 },
   { x: -28.8, y: -28.8 }
 ];
+/*
 const TIGER_POINTS = [
   { x: 4.6, y: 96 },
   { x: 30, y: 54.8 },
@@ -88,7 +94,27 @@ const TIGER_POINTS = [
   { x: 97.14, y: 222.63 },
   { x: 35.5, y: 194.9 },
   { x: 3.7, y: 135.0 }
-]
+];
+*/
+
+const KITTY_POINTS: {} = [
+  { x: 28.8 * KITTY_SCALE, y: 20.36 * KITTY_SCALE },
+  { x: 28.8 * KITTY_SCALE, y: -20.36 * KITTY_SCALE },
+  { x: -28.8 * KITTY_SCALE, y: 20.36 * KITTY_SCALE },
+  { x: -28.8 * KITTY_SCALE, y: -20.36 * KITTY_SCALE }
+];
+const PANDA_POINTS: {} = [
+  { x: 28.8, y: 20.36 },
+  { x: 28.8, y: -20.36 },
+  { x: -28.8, y: 20.36 },
+  { x: -28.8, y: -20.36 }
+];
+const TIGER_POINTS: {} = [
+  { x: 28.8 * TIGER_SCALE, y: 20.36 * TIGER_SCALE },
+  { x: 28.8 * TIGER_SCALE, y: -20.36 * TIGER_SCALE },
+  { x: -28.8 * TIGER_SCALE, y: 20.36 * TIGER_SCALE },
+  { x: -28.8 * TIGER_SCALE, y: -20.36 * TIGER_SCALE }
+];
 
 
 
@@ -309,6 +335,9 @@ export default class Application extends View {
                     switch (type) {
                       case 0: //square
                       case 2: //triangle
+                      case 3: //kitty
+                      case 4: //panda
+                      case 5: //tiger
                         if (this.circumscribedCircleCheck(n.x, n.y, line, i)) {
                           const p = this.findCollisionPoint(n.x, n.y, line, i);
                           const dx = p.x - n.x;
@@ -506,10 +535,51 @@ export default class Application extends View {
         );
         u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
         return u;
-      case 3: // tiger
-
-      case 4:
-      case 5:
+      case 3: // kitty
+        for (let i = 0; i < 4; i++) {
+          const x = KITTY_POINTS[i].x;
+          const y = KITTY_POINTS[i].y;
+          rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
+        }
+        t = this.closestTwo(
+          ballX, ballY,
+          [rotatedPoints[0],
+          rotatedPoints[1],
+          rotatedPoints[2],
+          rotatedPoints[3]]
+        );
+        u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
+        return u;
+      case 4: // panda
+        for (let i = 0; i < 4; i++) {
+          const x = PANDA_POINTS[i].x;
+          const y = PANDA_POINTS[i].y;
+          rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
+        }
+        t = this.closestTwo(
+          ballX, ballY,
+          [rotatedPoints[0],
+          rotatedPoints[1],
+          rotatedPoints[2],
+          rotatedPoints[3]]
+        );
+        u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
+        return u;
+      case 5: // tiger
+        for (let i = 0; i < 4; i++) {
+          const x = TIGER_POINTS[i].x;
+          const y = TIGER_POINTS[i].y;
+          rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
+        }
+        t = this.closestTwo(
+          ballX, ballY,
+          [rotatedPoints[0],
+          rotatedPoints[1],
+          rotatedPoints[2],
+          rotatedPoints[3]]
+        );
+        u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
+        return u;
     }
   }
 
@@ -562,6 +632,18 @@ export default class Application extends View {
         break;
       case 2: //triangle
         sumOfRadii = (80.64 * (1 - 1 / sqrt(3)) + BALL_RADIUS) * 1.2;
+        res = sumOfSquares < sumOfRadii * sumOfRadii;
+        break;
+      case 3: //kitty
+        sumOfRadii = ((57.6 / 2 * KITTY_SCALE) + BALL_RADIUS * sqrt(2)) * SLOP;
+        res = sumOfSquares < sumOfRadii * sumOfRadii;
+        break;
+      case 4: //panda
+        sumOfRadii = ((57.6 / 2) + BALL_RADIUS * sqrt(2)) * SLOP;
+        res = sumOfSquares < sumOfRadii * sumOfRadii;
+        break;
+      case 5: //tiger
+        sumOfRadii = ((57.6 / 2 * TIGER_SCALE) + BALL_RADIUS * sqrt(2)) * SLOP;
         res = sumOfSquares < sumOfRadii * sumOfRadii;
         break;
       default:
@@ -653,7 +735,7 @@ export default class Application extends View {
       const obstaclesInLine = 5 + (line & 1);
       for (let object = 0; object < 6; object++) {
         let active = object < obstaclesInLine && random() > .5;
-        let type = rollInt(0, 2);
+        let type = rollInt(3, 5);
 
         // debugging test
         // set to a square and let only one appear
@@ -662,10 +744,10 @@ export default class Application extends View {
           //active = false;
         }
 
-        //1/3 of the time, use 0 degrees rotation, else randomly choose a rotation that's
+        //1/5 of the time, use 0 degrees rotation, else randomly choose a rotation that's
         // not too terribly far from 0
         let angle = (rollInt(0, 6) - 3) / 24 * TAU;
-        if (random() < .33) {
+        if (random() < .2) {
           angle = 0;
         }
 
@@ -685,6 +767,12 @@ export default class Application extends View {
         let scale = IMAGE_SCALE;
         if (type === 2) {
           scale = TRIANGLE_SCALE;
+        }
+        if (type === 3) {
+          scale *= KITTY_SCALE;
+        }
+        if (type === 5) {
+          scale *= TIGER_SCALE;
         }
         center(this.obstacles[line][object], scale);
         //triangles are different
