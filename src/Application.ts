@@ -153,6 +153,8 @@ export default class Application extends View {
   private leftLine: ImageView;
   private rightLine: ImageView;
 
+  private cloud: ImageView[];
+
   constructor(opts) {
     super(opts);
 
@@ -261,6 +263,9 @@ export default class Application extends View {
   onInputMove (event, position) {
     if (!this.inShot) {
       this.updateGuide(position);
+      for (let i = 0; i < NUM_GUIDES; i++) {
+        this.guide[i].style.visible = true;
+      }
     }
   }
 
@@ -295,6 +300,16 @@ export default class Application extends View {
   _tick (dt) {
     this.game.tick(dt);
     this.timeSinceStart += dt;
+
+    const cloudSpeed = [.01, .005, .003];
+    for (let i = 0; i < 3; i++) {
+      let x = this.cloud[i].style.x;
+      x += cloudSpeed[i] * dt;
+      if (x > 600) {
+        x = - 300;
+      }
+      this.cloud[i].style.x = x;
+    }
 
     if (this.inShot) {
       // if I need to fire any balls, do it
@@ -716,7 +731,7 @@ export default class Application extends View {
     this.obstacles = [];
     this.digits = [];
     this.shapeTypes = [];
-    let y = 400;
+    let y = 800;
     let activeCount = 0;
     for (let line = 0; line < 20; line++) {
       this.shapeTypes[line] = [];
@@ -736,13 +751,6 @@ export default class Application extends View {
       for (let object = 0; object < 6; object++) {
         let active = object < obstaclesInLine && random() > .5;
         let type = rollInt(3, 5);
-
-        // debugging test
-        // set to a square and let only one appear
-        //type = 2;
-        if (activeCount > 0) {
-          //active = false;
-        }
 
         //1/5 of the time, use 0 degrees rotation, else randomly choose a rotation that's
         // not too terribly far from 0
@@ -815,7 +823,29 @@ export default class Application extends View {
       width: GAMEPLAY_WIDTH,
       height: GAMEPLAY_HEIGHT,
       //backgroundColor: '#242551'
+      clip: true,
     });
+
+    const cloudImages = [
+      'resources/images/game/objects/cloud_01.png',
+      'resources/images/game/objects/cloud_02.png',
+      'resources/images/game/objects/cloud_03.png'
+    ];
+    const cloudY = [
+      500, 300, 225
+    ]
+
+    this.cloud = [];
+    for (let i = 0; i < 3; i++) {
+      this.cloud[i] = new ImageView({
+        parent: this.playfield,
+        image: cloudImages[i],
+        autoSize: true,
+        x: rollInt(0, 500),
+        y: cloudY[i],
+        clip: true,
+      })
+    }
 
     this.ball = [];
     const d = BALL_DIAMETER * 1.3;
