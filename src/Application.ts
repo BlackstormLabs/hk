@@ -342,7 +342,7 @@ export default class Application extends View {
             //objects
             let collisionsThisFrame = false;
             for (let line = 0; line < 20; line++) {
-              if (this.roughCheckCollision(n.x, n.y, line)) {
+              if (this.roughCheckCollision(n.x, n.y, line) && this.yOfLine(line) < 1010) {
                 for (let i = 0; i < 6; i++) {
                   const ob = this.obstacles[line][i].style;
                   if (ob.visible) {
