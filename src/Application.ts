@@ -68,6 +68,28 @@ const SQUARE_POINTS = [
   { x: -28.8, y: 28.8 },
   { x: -28.8, y: -28.8 }
 ];
+const TIGER_POINTS = [
+  { x: 4.6, y: 96 },
+  { x: 30, y: 54.8 },
+  { x: 29, y: 22.9 },
+  { x: 55.1, y: 2.5 },
+  { x: 80.6, y: 2.9 },
+  { x: 99.9, y: 23.2 },
+  { x: 129.7, y: 19.6 },
+  { x: 165.7, y: 23.7 },
+  { x: 189.5, y: 1.6 },
+  { x: 221.6, y: 9.23 },
+  { x: 237.9, y: 38.5 },
+  { x: 231.9, y: 59.76 },
+  { x: 252.05, y: 94.12 },
+  { x: 254.1, y: 130.0 },
+  { x: 234.0, y: 181.0 },
+  { x: 160.4, y: 221.9 },
+  { x: 97.14, y: 222.63 },
+  { x: 35.5, y: 194.9 },
+  { x: 3.7, y: 135.0 }
+]
+
 
 
 
@@ -143,7 +165,7 @@ export default class Application extends View {
     platform.startGameAsync();
   }
 
-  generateGameData() {
+  generateGameData () {
     this.obstaclePosX = [];
     for (let line = 0; line <= 1; line++) {
       this.obstaclePosX[line] = [];
@@ -154,7 +176,7 @@ export default class Application extends View {
     }
   }
 
-  updateGuide(position) {
+  updateGuide (position) {
     const sourceX = LAUNCH_X;
     const sourceY = LAUNCH_Y;
     const pos = this.screenToPlayfield(position);
@@ -169,7 +191,7 @@ export default class Application extends View {
       this.pointing_dx = dx * LAUNCH_SPEED;
       this.pointing_dy = dy * LAUNCH_SPEED;
       const angle = Math.atan2(dy, dx);
-      this.header_arrow.style.r = angle - TAU /4;
+      this.header_arrow.style.r = angle - TAU / 4;
 
       for (let i = 0; i < NUM_GUIDES; i++) {
         this.guide[i].style.x = lerp(sourceX, sourceX + dx, i / NUM_GUIDES);
@@ -178,14 +200,14 @@ export default class Application extends View {
     }
   }
 
-  screenToPlayfield(p) {
+  screenToPlayfield (p) {
     return {
       x: (p.x - this.playfield.style.offsetX) / this.playfield.style.scale,
       y: (p.y - this.playfield.style.offsetY) / this.playfield.style.scale
     }
   }
 
-  onInputStart(event, position) {
+  onInputStart (event, position) {
     if (!this.inShot) {
       this.updateGuide(position);
       for (let i = 0; i < NUM_GUIDES; i++) {
@@ -194,7 +216,7 @@ export default class Application extends View {
     }
   }
 
-  onInputSelect(event, position) {
+  onInputSelect (event, position) {
     if (!this.inShot) {
       for (let i = 0; i < NUM_GUIDES; i++) {
         this.guide[i].style.visible = false;
@@ -210,13 +232,13 @@ export default class Application extends View {
     }
   }
 
-  onInputMove(event, position) {
+  onInputMove (event, position) {
     if (!this.inShot) {
       this.updateGuide(position);
     }
   }
 
-  _resize() {
+  _resize () {
     const screen = device.screen;
     const screenWidth = screen.width;
     const screenHeight = screen.height;
@@ -244,7 +266,7 @@ export default class Application extends View {
     //console.log(screenWidth, screenHeight);
   }
 
-  _tick(dt) {
+  _tick (dt) {
     this.game.tick(dt);
     this.timeSinceStart += dt;
 
@@ -271,7 +293,7 @@ export default class Application extends View {
             }
 
             //ceiling
-            if (n.y < 110 && d.dy < 0)  {
+            if (n.y < 110 && d.dy < 0) {
               this.pb[ball].setVelocity(d.dx * .8, -d.dy * .6);
               this.pb[ball].preCollision = false;
             }
@@ -376,62 +398,38 @@ export default class Application extends View {
         this.inShot = false;
         //console.log("calling moveLinesUp");
         this.moveLinesUp();
-
-        //this.resetFilterToYellow();
       }
     }
   }
 
 
   // returns yMin
-  yOfLine(line) {
+  yOfLine (line) {
     return this.linefield[line].style.y;
   }
 
-
-  closestTwoOfFour(x, y, p0, p1, p2, p3) {
-    let ax = p0.x, ay = p0.y;
-    let bx = p1.x, by = p1.y;
-    let cx = p2.x, cy = p2.y;
-    let dx = p3.x, dy = p3.y;
-    let d0 = (ax - x) * (ax - x) + (ay - y) * (ay - y);
-    let d1 = (bx - x) * (bx - x) + (by - y) * (by - y);
-    let d2 = (cx - x) * (cx - x) + (cy - y) * (cy - y);
-    let d3 = (dx - x) * (dx - x) + (dy - y) * (dy - y);
-
-    if (d0 === max(d0, d1, d2, d3)) {
-      return this.closestTwoOfThree(x, y, p1, p2, p3);
+  closestTwo (x, y, p) {
+    let small = [Number.MAX_VALUE, 0, 0];
+    let smallest = [Number.MAX_VALUE, 0, 0];
+    for (let i = 0; i < p.length; i++) {
+      const px = p[i].x;
+      const py = p[i].y;
+      const dx = x - px;
+      const dy = y - py;
+      const d = dx * dx + dy * dy;
+      if (d < smallest[0]) {
+        small = smallest;
+        smallest = [d, px, py];
+      } else if (d < small[0]) {
+        small = [d, px, py];
+      }
     }
-    if (d1 === max(d1, d2, d3)) {
-      return this.closestTwoOfThree(x, y, p0, p2, p3);
-    }
-    if (d2 > d3) {
-      return this.closestTwoOfThree(x, y, p0, p1, p3);
-    }
-    return this.closestTwoOfThree(x, y, p0, p1, p2);
-  }
-
-
-  closestTwoOfThree(x, y, p0, p1, p2) {
-    let ax = p0.x, ay = p0.y;
-    let bx = p1.x, by = p1.y;
-    let cx = p2.x, cy = p2.y;
-    let d0 = (ax - x) * (ax - x) + (ay - y) * (ay - y);
-    let d1 = (bx - x) * (bx - x) + (by - y) * (by - y);
-    let d2 = (cx - x) * (cx - x) + (cy - y) * (cy - y);
-
-    if (d0 === max(d0, d1, d2)) { // p0 is farthest
-      return { p0: p1, p1: p2 };
-    }
-    if (d1 > d2) {
-      return { p0: p0, p1: p2 }; // p1 is farthest
-    }
-    return { p0: p0, p1: p1 }; // p2 is farthest
+    return { p0: { x: smallest[1], y: smallest[2] }, p1: { x: small[1], y: small[2] } };
   }
 
 
   // binary search to find closest point
-  interpolateClosestOfPair(x, y, p0, p1) {
+  interpolateClosestOfPair (x, y, p0, p1) {
     let ax = p0.x;
     let ay = p0.y;
     let bx = p1.x;
@@ -462,7 +460,7 @@ export default class Application extends View {
   //to do: at some point, should init the corners based
   //  on the rotation of the objects. avoid the trig
   // USES TRIANGLE_POINTS and SQUARE_POINTS
-  findCollisionPoint(ballX, ballY, line, obstacle) {
+  findCollisionPoint (ballX, ballY, line, obstacle) {
     const ob = this.obstacles[line][obstacle].style;
     //might need TAU - r. Needs test
     const s = sin(ob.r);
@@ -483,12 +481,12 @@ export default class Application extends View {
           const y = SQUARE_POINTS[i].y;
           rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
         }
-        t = this.closestTwoOfFour(
+        t = this.closestTwo(
           ballX, ballY,
-          rotatedPoints[0],
+          [rotatedPoints[0],
           rotatedPoints[1],
           rotatedPoints[2],
-          rotatedPoints[3]
+          rotatedPoints[3]]
         );
         u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
         return u;
@@ -500,14 +498,18 @@ export default class Application extends View {
           const y = TRIANGLE_POINTS[i].y;
           rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
         }
-        t = this.closestTwoOfThree(
+        t = this.closestTwo(
           ballX, ballY,
-          rotatedPoints[0],
+          [rotatedPoints[0],
           rotatedPoints[1],
-          rotatedPoints[2]
+          rotatedPoints[2]]
         );
         u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
         return u;
+      case 3: // tiger
+
+      case 4:
+      case 5:
     }
   }
 
@@ -522,7 +524,7 @@ export default class Application extends View {
    * @param py point y
    * @param cor coefficient of restitution
    */
-  ballVsPoint(bx, by, vx, vy, px, py, cor) {
+  ballVsPoint (bx, by, vx, vy, px, py, cor) {
     let dx = px - bx;
     let dy = py - by;
     const mult = 1.0 / sqrt(dx * dx + dy * dy);
@@ -538,7 +540,7 @@ export default class Application extends View {
     return { dx: newDX, dy: newDY };
   }
 
-  circumscribedCircleCheck(x, y, line, obstacle) {
+  circumscribedCircleCheck (x, y, line, obstacle) {
     const SLOP = 1.1;
     const ob = this.obstacles[line][obstacle].style;
     let sumOfRadii;
@@ -571,7 +573,7 @@ export default class Application extends View {
 
 
   // possibly touching anything in this line?
-  roughCheckCollision(x, y, line) {
+  roughCheckCollision (x, y, line) {
     // first filter -- is the ball in the line's y range?
     const yMin = this.yOfLine(line) - 10; //slop for overlap
     const yMax = yMin + LINE_HEIGHT + 10; //slop for overlap
@@ -598,7 +600,7 @@ export default class Application extends View {
     return false;
   }
 
-  moveLinesUp() {
+  moveLinesUp () {
     for (let i = 0; i < this.linefield.length; i++) {
       const y = this.linefield[i].style.y;
       animate(this.linefield[i])
@@ -607,7 +609,7 @@ export default class Application extends View {
     }
   }
 
-  resetFilterToYellow() {
+  resetFilterToYellow () {
     for (let line = 0; line < 20; line++) {
       for (let obstacle = 0; obstacle < 6; obstacle++) {
         this.obstacles[line][obstacle].setFilter(yellowFilter);
@@ -615,7 +617,7 @@ export default class Application extends View {
     }
   }
 
-  spinObjects(dt) {
+  spinObjects (dt) {
     let angle = (this.timeSinceStart / 1000) | 0;
     angle %= 3;
 
@@ -627,7 +629,7 @@ export default class Application extends View {
     }
   }
 
-  buildObstacleLines() {
+  buildObstacleLines () {
     this.linefield = [];
     this.obstacles = [];
     this.digits = [];
@@ -663,7 +665,7 @@ export default class Application extends View {
         //1/3 of the time, use 0 degrees rotation, else randomly choose a rotation that's
         // not too terribly far from 0
         let angle = (rollInt(0, 6) - 3) / 24 * TAU;
-        if (angle < .33) {
+        if (random() < .33) {
           angle = 0;
         }
 
@@ -716,7 +718,7 @@ export default class Application extends View {
 
 
 
-  _startGame() {
+  _startGame () {
     this.playfield = new ImageView({
       parent: this,
       image: 'resources/images/game/background/background.png',
@@ -788,7 +790,7 @@ export default class Application extends View {
       height: 144,
       anchorX: 96 / 2,
       anchorY: -10,
-      offsetX: -96/2,
+      offsetX: -96 / 2,
       offsetY: 10
     });
 
