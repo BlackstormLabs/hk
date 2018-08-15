@@ -11,6 +11,7 @@ import { center, setValue } from './lib/GameHelpers';
 import PachinkoBall from './PachinkoBall';
 import Game from './Game';
 import platform from 'frontend/devkit-fbinstant/js';
+import sounds from 'src/lib/sounds'
 
 import {
   GAMEPLAY_HEIGHT,
@@ -44,6 +45,7 @@ const paleBlueFilter = new filter.MultiplyFilter('#C4BFFF');
 const yellowFilter = new filter.MultiplyFilter('#FF0');
 const redFilter = new filter.MultiplyFilter('#F00');
 
+const CONTACT_SOUND_THRESHOLD = 80;
 const DIGITS_SCALE = .75;
 const OBJECT_WIDTH = 80;
 const LINE_HEIGHT = OBJECT_WIDTH / 2 * sqrt(3);
@@ -146,6 +148,8 @@ export default class Application extends View {
   private shapeTypes: any[];
   private digits: any[];
 
+  private lastSoundPlayedTime: number;
+
   private collisionsThisFrame: boolean;
 
   private linefield: any
@@ -159,6 +163,8 @@ export default class Application extends View {
     super(opts);
 
     this.game = new Game();
+
+    this.lastSoundPlayedTime = Date.now();
 
     this.shapeTypes = [];
     this.obstacles = [];
@@ -360,6 +366,13 @@ export default class Application extends View {
                           const sumSquares = dx * dx + dy * dy;
                           if (sumSquares < BALL_RADIUS * BALL_RADIUS) {
                             this.obstacles[line][i].value--;
+
+
+                            if (Date.now() - this.lastSoundPlayedTime >= CONTACT_SOUND_THRESHOLD) {
+                              this.lastSoundPlayedTime = Date.now();
+                              sounds.playSound('contact');
+                            }
+
                             animate(this.obstacles[line][i])
                               .now({ scale: .95 }, 50, animate.easeInOutSine)
                               .then({ scale: 1.0 }, 50, animate.easeInOutSine)
@@ -704,6 +717,10 @@ export default class Application extends View {
         .wait(i * 15)
         .then({ y: y - LINE_HEIGHT }, 500, animate.easeInOutSine);
     }
+
+    setTimeout(() => {
+      sounds.playSound('line');
+    }, 500);
   }
 
   resetFilterToYellow () {
@@ -923,8 +940,7 @@ export default class Application extends View {
       centerOnOrigin: true
     });
 
-    // sorry for the annoying music
-    // sounds.playSong('mainmenu');
+    sounds.playSong('game');
   }
 }
 
