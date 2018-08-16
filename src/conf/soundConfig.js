@@ -2,11 +2,11 @@ export default {
   sfxPath: 'resources/sounds/sfx',
   musicPath: 'resources/sounds/music',
   music: {
-    'mainmenu': {
+    'game': {
       background: true,
       volume: 0.5,
       sources: [
-        'bgm01.mp3'
+        'bgm03.mp3'
       ]
     }
   },
@@ -15,6 +15,18 @@ export default {
       volume: 1,
       sources: [
         'se01.mp3'
+      ]
+    },
+    'contact': {
+      volume: 0.15,
+      sources: [
+        'se35.mp3'
+      ]
+    },
+    'line': {
+      volume: 0.5,
+      sources: [
+        'se04.mp3'
       ]
     }
   }
