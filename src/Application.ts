@@ -307,6 +307,15 @@ export default class Application extends View {
     this.game.tick(dt);
     this.timeSinceStart += dt;
 
+    // warning. danger zone
+    for (let line = 0; line < 20; line++) {
+      if (this.yOfLine(line) < 150) {
+        for (let i = 0; i < 6; i++) {
+          this.obstacles[line][i].style.opacity = ((this.timeSinceStart >> 7) & 1) * 0.5 + .25;
+        }
+      }
+    }
+
     const cloudSpeed = [.01, .005, .003];
     for (let i = 0; i < 3; i++) {
       let x = this.cloud[i].style.x;
