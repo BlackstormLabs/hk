@@ -493,7 +493,7 @@ export default class Application extends View {
     return { p0: { x: smallest[1], y: smallest[2] }, p1: { x: small[1], y: small[2] } };
   }
 
-  ClosestOutlinePoint (x: number, y: number, p): number {
+  closestOutlinePoint (x: number, y: number, p): number {
     let small: number = Number.MAX_VALUE;
     let index: number;
     for (let i: number = 0; i < p.length; i++) {
@@ -511,7 +511,7 @@ export default class Application extends View {
   }
 
   findBouncePoint (x, y, p) {
-    const index = this.ClosestOutlinePoint(x, y, p);
+    const index = this.closestOutlinePoint(x, y, p);
 
     // do the clockwise and counterclockwise adjacent points
     const a = this.interpolateClosestOfPair(x, y, p[index], p[(index + 1) % p.length]);
