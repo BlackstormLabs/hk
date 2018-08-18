@@ -102,20 +102,20 @@ const TIGER_POINTS = [
 const KITTY_POINTS: {} = [
   { x: 28.8 * KITTY_SCALE, y: 20.36 * KITTY_SCALE },
   { x: 28.8 * KITTY_SCALE, y: -20.36 * KITTY_SCALE },
+  { x: -28.8 * KITTY_SCALE, y: -20.36 * KITTY_SCALE },
   { x: -28.8 * KITTY_SCALE, y: 20.36 * KITTY_SCALE },
-  { x: -28.8 * KITTY_SCALE, y: -20.36 * KITTY_SCALE }
 ];
 const PANDA_POINTS: {} = [
   { x: 28.8, y: 20.36 },
   { x: 28.8, y: -20.36 },
+  { x: -28.8, y: -20.36 },
   { x: -28.8, y: 20.36 },
-  { x: -28.8, y: -20.36 }
 ];
 const TIGER_POINTS: {} = [
   { x: 28.8 * TIGER_SCALE, y: 20.36 * TIGER_SCALE },
   { x: 28.8 * TIGER_SCALE, y: -20.36 * TIGER_SCALE },
+  { x: -28.8 * TIGER_SCALE, y: -20.36 * TIGER_SCALE },
   { x: -28.8 * TIGER_SCALE, y: 20.36 * TIGER_SCALE },
-  { x: -28.8 * TIGER_SCALE, y: -20.36 * TIGER_SCALE }
 ];
 
 
@@ -493,6 +493,36 @@ export default class Application extends View {
     return { p0: { x: smallest[1], y: smallest[2] }, p1: { x: small[1], y: small[2] } };
   }
 
+  closestOutlinePoint (x: number, y: number, p): number {
+    let small: number = Number.MAX_VALUE;
+    let index: number;
+    for (let i: number = 0; i < p.length; i++) {
+      const px: number = p[i].x;
+      const py: number = p[i].y;
+      const dx: number = x - px;
+      const dy: number = y - py;
+      const d: number = dx * dx + dy * dy;
+      if (d < small) {
+        small = d;
+        index = i;
+      }
+    }
+    return index;
+  }
+
+  findBouncePoint (x, y, p) {
+    const index = this.closestOutlinePoint(x, y, p);
+
+    // do the clockwise and counterclockwise adjacent points
+    const a = this.interpolateClosestOfPair(x, y, p[index], p[(index + 1) % p.length]);
+    const b = this.interpolateClosestOfPair(x, y, p[index], p[(index - 1 + p.length) % p.length]);
+
+    if (a.x === p[index].x && a.y === p[index].y) {
+      return b;
+    } else {
+      return a;
+    }
+  }
 
   // binary search to find closest point
   interpolateClosestOfPair (x, y, p0, p1) {
@@ -578,45 +608,21 @@ export default class Application extends View {
           const y = KITTY_POINTS[i].y;
           rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
         }
-        t = this.closestTwo(
-          ballX, ballY,
-          [rotatedPoints[0],
-          rotatedPoints[1],
-          rotatedPoints[2],
-          rotatedPoints[3]]
-        );
-        u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
-        return u;
+        return this.findBouncePoint(ballX, ballY, rotatedPoints);
       case 4: // panda
         for (let i = 0; i < 4; i++) {
           const x = PANDA_POINTS[i].x;
           const y = PANDA_POINTS[i].y;
           rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
         }
-        t = this.closestTwo(
-          ballX, ballY,
-          [rotatedPoints[0],
-          rotatedPoints[1],
-          rotatedPoints[2],
-          rotatedPoints[3]]
-        );
-        u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
-        return u;
+        return this.findBouncePoint(ballX, ballY, rotatedPoints);
       case 5: // tiger
         for (let i = 0; i < 4; i++) {
           const x = TIGER_POINTS[i].x;
           const y = TIGER_POINTS[i].y;
           rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
         }
-        t = this.closestTwo(
-          ballX, ballY,
-          [rotatedPoints[0],
-          rotatedPoints[1],
-          rotatedPoints[2],
-          rotatedPoints[3]]
-        );
-        u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
-        return u;
+        return this.findBouncePoint(ballX, ballY, rotatedPoints);
     }
   }
 
@@ -848,7 +854,7 @@ export default class Application extends View {
       y: 0,
       width: GAMEPLAY_WIDTH,
       height: GAMEPLAY_HEIGHT,
-      //backgroundColor: '#242551'
+      backgroundColor: '#242551',
       clip: true,
     });
 
