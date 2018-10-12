@@ -6,63 +6,63 @@
 	<dict>
 		<key>Resources/Info.plist</key>
 		<data>
-		MapxsSBIfPovt8rONPU5IvJQKYM=
+		3P/+kz2IsJJ0HAmkghvh014Lq+Q=
 		</data>
 		<key>Resources/advpng</key>
 		<data>
-		xFawkN38SM85Kx/aHV8MU1jhWYk=
+		bdyL3eMhB7O1tdu4izcMKaIfS2o=
 		</data>
 		<key>Resources/gifsicle</key>
 		<data>
-		txPQftYfdjOguZtrUtOkC2E+EdU=
+		QfPzmCA5MOqZjF1axh/5pgoXuyg=
 		</data>
 		<key>Resources/guetzli</key>
 		<data>
-		2kGO5VU6laZLvbD+sfImMfYqFRY=
+		E4+GFK2uNwE6lLiYWipQJD4A2sc=
 		</data>
 		<key>Resources/jpegoptim</key>
 		<data>
-		QU+tambAy7V21wjgeG3OthJMVRQ=
+		NJuqA8CxMq3xGj8bU+uKXerW/ZM=
 		</data>
 		<key>Resources/jpegtran</key>
 		<data>
-		+zyPufn3Spjz+VSnqoOIvHESugA=
+		ycnxekUC6i6HfvH+ghHaFW/NhJ4=
 		</data>
 		<key>Resources/libimageoptimjpeg.dylib</key>
 		<data>
-		9cupc2fn9ZeFj4gxbNEvw3dujJ8=
+		FPOpZhQ5MxWYxEKOF2yOLkdjAjo=
 		</data>
 		<key>Resources/liblibpng.dylib</key>
 		<data>
-		MqbO/eJ3SeztHbKibvSF0+vJRx0=
+		cuqMRSy/LLZbQH4gmoVCNIyc2wI=
 		</data>
-		<key>Resources/optipng</key>
+		<key>Resources/oxipng</key>
 		<data>
-		Wul59V4AcBz6n4OVHgzcwjWMqWE=
+		av0MBEgZ8ZqRGBd+54bVd3adP0I=
 		</data>
 		<key>Resources/pngcrush</key>
 		<data>
-		Wmc/ALGa2jE70h2q4Obphh/LEQI=
+		8dkXYdYHrsW6CnN252wO3fzMlQs=
 		</data>
 		<key>Resources/pngout</key>
 		<data>
-		lFLVH82oDDi0jWohnu04/9X+6gs=
+		mi3yCBZsbPLCtJpilf0xV96waKw=
 		</data>
 		<key>Resources/pngquant</key>
 		<data>
-		iOEeVOfbE96/kx7QxDSdlxHsUpI=
+		aa+aNr1cc/6j+oX4UjmX66+EIfU=
 		</data>
 		<key>Resources/svgcleaner</key>
 		<data>
-		sPh/dKDe+4GQVcyA3NEtVh/zR0k=
+		HXe0pcuxaWihq03BfO4SZ82WLzM=
 		</data>
 		<key>Resources/svgo.js</key>
 		<data>
-		cZQE7wuOddkxn6Eqd1sXnw4Mzt8=
+		ZcT8Uy9dZ3Evv8bnRgPiu/djE1U=
 		</data>
 		<key>Resources/zopflipng</key>
 		<data>
-		68UYr1RVqxDMqdLCnJrLUXeD8AQ=
+		oLQYbdBnRvGhPNOpEoSLdn0w2Z0=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -71,165 +71,165 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			MapxsSBIfPovt8rONPU5IvJQKYM=
+			3P/+kz2IsJJ0HAmkghvh014Lq+Q=
 			</data>
 			<key>hash2</key>
 			<data>
-			mQGyKbcqKJlktKSwtJ885EbwRw9FsUHRWNFarenuMxE=
+			O4JW3PAW8UfzExfeyd9AKVIZga3sSCnKTO3EUZ42Vmw=
 			</data>
 		</dict>
 		<key>Resources/advpng</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			xFawkN38SM85Kx/aHV8MU1jhWYk=
+			bdyL3eMhB7O1tdu4izcMKaIfS2o=
 			</data>
 			<key>hash2</key>
 			<data>
-			Q33lpD729+rvugJSJ74Y4+Te58fEXSipIdyAqeLP4IU=
+			p4Faz2w0zBpqfFVgcWa/YdFxr2oPBiAQxK7lv0ZIA54=
 			</data>
 		</dict>
 		<key>Resources/gifsicle</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			txPQftYfdjOguZtrUtOkC2E+EdU=
+			QfPzmCA5MOqZjF1axh/5pgoXuyg=
 			</data>
 			<key>hash2</key>
 			<data>
-			/CgNm6jZi1zDVAgMUGwafs4bfVqb3e81lfc0UaKYpLc=
+			54R0eA3E1WuDLF3hA7xvu+y+APwImL//N/j5KzfQC+Q=
 			</data>
 		</dict>
 		<key>Resources/guetzli</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			2kGO5VU6laZLvbD+sfImMfYqFRY=
+			E4+GFK2uNwE6lLiYWipQJD4A2sc=
 			</data>
 			<key>hash2</key>
 			<data>
-			EmzTSGVXthqMLTKhZ8UKKuMlDFz9D1/t+FD7uITPv0Q=
+			M+BuyKGZ30EORTVMgQszZxpXs0cfWnB1aIg1F1El0eg=
 			</data>
 		</dict>
 		<key>Resources/jpegoptim</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			QU+tambAy7V21wjgeG3OthJMVRQ=
+			NJuqA8CxMq3xGj8bU+uKXerW/ZM=
 			</data>
 			<key>hash2</key>
 			<data>
-			+gomDE5eNMDXM4hUB+NKO46AEAbGBh9B4IxH3/ixCDs=
+			ybEcMahGJejKMiOD6xTtNORSTutTSGEbLl4EBiTwB+k=
 			</data>
 		</dict>
 		<key>Resources/jpegtran</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			+zyPufn3Spjz+VSnqoOIvHESugA=
+			ycnxekUC6i6HfvH+ghHaFW/NhJ4=
 			</data>
 			<key>hash2</key>
 			<data>
-			gtKsS0FI59PDHn019dq8qfa5GvN5B45I78t0FEAbw2U=
+			gAcDppVltcFZJXNe13wfiHZHeDn7flmp/HsrDkGSgrw=
 			</data>
 		</dict>
 		<key>Resources/libimageoptimjpeg.dylib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			9cupc2fn9ZeFj4gxbNEvw3dujJ8=
+			FPOpZhQ5MxWYxEKOF2yOLkdjAjo=
 			</data>
 			<key>hash2</key>
 			<data>
-			0xT4z2M85MdJonAgv3z5cQUGg/KnqW3KrsDX3GfWVxw=
+			w/N4mHP6UuLp4OBpLUgPpHyxRdT3jr0iSiyxHnYgMIo=
 			</data>
 		</dict>
 		<key>Resources/liblibpng.dylib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			MqbO/eJ3SeztHbKibvSF0+vJRx0=
+			cuqMRSy/LLZbQH4gmoVCNIyc2wI=
 			</data>
 			<key>hash2</key>
 			<data>
-			1b9nSGX/X0fIoIqkG9VhaSCQXRvkOhx5PPjL9WSUbp0=
+			I1P6noOZOheNogez6jx+BH5hpaXTsmU4z2oXvi0WMiU=
 			</data>
 		</dict>
-		<key>Resources/optipng</key>
+		<key>Resources/oxipng</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			Wul59V4AcBz6n4OVHgzcwjWMqWE=
+			av0MBEgZ8ZqRGBd+54bVd3adP0I=
 			</data>
 			<key>hash2</key>
 			<data>
-			bSPD4zRi2CorBiT0EIO3JuZ2LKyt2q60y/uDpYoOnsI=
+			yPDQCd3ssEiQ4SAT1jcZcdAM6VsR9bpixyMk3wRx66s=
 			</data>
 		</dict>
 		<key>Resources/pngcrush</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			Wmc/ALGa2jE70h2q4Obphh/LEQI=
+			8dkXYdYHrsW6CnN252wO3fzMlQs=
 			</data>
 			<key>hash2</key>
 			<data>
-			NXMcvXizQRQAChPuDXimNpK2oQ0xeVjQ6x+DgaMkumk=
+			hqenVwL/xBHesXaOrpLqCcmaM0/jkTQGkZweMGfsOB4=
 			</data>
 		</dict>
 		<key>Resources/pngout</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			lFLVH82oDDi0jWohnu04/9X+6gs=
+			mi3yCBZsbPLCtJpilf0xV96waKw=
 			</data>
 			<key>hash2</key>
 			<data>
-			CWeWQ976apCI25m3xHd7QVx4wdA5VrXXQD4175ZTtDU=
+			AecOtEKQdJXT550De+YKzTON17dac4JqiRnsRhevJl0=
 			</data>
 		</dict>
 		<key>Resources/pngquant</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			iOEeVOfbE96/kx7QxDSdlxHsUpI=
+			aa+aNr1cc/6j+oX4UjmX66+EIfU=
 			</data>
 			<key>hash2</key>
 			<data>
-			CriOQK23SdfXWPrX6yOlrlIPyOM8En3t3PP61/6wmbA=
+			ZyFM7QGwjquKGgdahoTJ68WTKh1e6r8Gjvro9H1LlZw=
 			</data>
 		</dict>
 		<key>Resources/svgcleaner</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			sPh/dKDe+4GQVcyA3NEtVh/zR0k=
+			HXe0pcuxaWihq03BfO4SZ82WLzM=
 			</data>
 			<key>hash2</key>
 			<data>
-			9CZftDmY1YTljt5ZP/JxBksOju1cotEruso0HMCKZgY=
+			JqDlGoka1PmaoAZzONWkh7lIb6nl1WEb/8gdtYuhYUU=
 			</data>
 		</dict>
 		<key>Resources/svgo.js</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			cZQE7wuOddkxn6Eqd1sXnw4Mzt8=
+			ZcT8Uy9dZ3Evv8bnRgPiu/djE1U=
 			</data>
 			<key>hash2</key>
 			<data>
-			ULGuvR2zDMPNr8ODU9jhZEfZrWeD71Ea/t5LLq3M/28=
+			RGn2sw2FIS6JkFVlZkY/9j//LsGEID5D0WXFLK4mgPI=
 			</data>
 		</dict>
 		<key>Resources/zopflipng</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			68UYr1RVqxDMqdLCnJrLUXeD8AQ=
+			oLQYbdBnRvGhPNOpEoSLdn0w2Z0=
 			</data>
 			<key>hash2</key>
 			<data>
-			i0wYiJu/FZc/Yf/FbTBO4VWXwqAFTjwhvzCxozbeo/0=
+			6Xjq9rfeuAxsEjtpBYtYzMHq5GuanuZJ3uDjZ/PN/Wo=
 			</data>
 		</dict>
 	</dict>

@@ -6,17 +6,19 @@ import animate from 'frontend/devkit-core/timestep/src/animate';
 import device from 'frontend/devkit-core/timestep/src/device';
 import ImageView from 'frontend/devkit-core/timestep/src/ui/ImageView';
 import View from 'frontend/devkit-core/timestep/src/ui/View';
-import { max, lerp, sqrt, rollInt, random, TAU, between, sin, cos } from './lib/MathHelpers';
-import { center, setValue } from './lib/GameHelpers';
+import { max, lerp, sqrt, rollInt, TAU, between, sin, cos, min, rollFloat } from './lib/MathHelpers';
+import { center, setValue, drawScore, getLevelName, setMessage, updateClouds, screenToPlayfield, resize, yOfLine, drawNormal } from './lib/GameHelpers';
 import PachinkoBall from './PachinkoBall';
-import Game from './Game';
+import Game, { IMAGE_SCALE, TRIANGLE_SCALE, OBJECT_WIDTH, MESSAGE_DURATION, BALL_RADIUS, HIT_DELAY, LINE_HEIGHT, DIGITS_SCALE, BALL_DIAMETER } from './Game';
 import platform from 'frontend/devkit-fbinstant/js';
 import sounds from 'src/lib/sounds'
+import BallPhysics from './BallPhysics'
+import HKPhysics from './HKPhysics'
 
 import {
   GAMEPLAY_HEIGHT,
   GAMEPLAY_WIDTH,
-  NUM_BALLS,
+  MAX_BALLS,
   NUM_GUIDES,
   LAUNCH_X,
   LAUNCH_Y,
@@ -24,7 +26,7 @@ import {
   BALLSCALE,
 } from './Game';
 import filter from "frontend/devkit-core/timestep/src/ui/filter";
-
+import Levels from './Levels';
 
 // obstaclePosX
 //
@@ -41,21 +43,12 @@ import filter from "frontend/devkit-core/timestep/src/ui/filter";
 // This is the game data. obstacles[line][object] is the two-dimensional array of ImageView
 //   that corresponds to this data.
 
+const SHOW_COLLISIONS = false;
 const paleBlueFilter = new filter.MultiplyFilter('#C4BFFF');
 const yellowFilter = new filter.MultiplyFilter('#FF0');
 const redFilter = new filter.MultiplyFilter('#F00');
+const whiteFilter = new filter.MultiplyFilter('#FFF');
 
-const CONTACT_SOUND_THRESHOLD = 80;
-const DIGITS_SCALE = .75;
-const OBJECT_WIDTH = 80;
-const LINE_HEIGHT = OBJECT_WIDTH / 2 * sqrt(3);
-const IMAGE_SCALE = .225;
-const TRIANGLE_SCALE = IMAGE_SCALE * 1.4;
-const KITTY_SCALE = 1.2;
-const TIGER_SCALE = 1.2;
-const TRIANGLE_CENTER = 4 / 12 * sqrt(3);
-const BALL_DIAMETER = 24;
-const BALL_RADIUS = BALL_DIAMETER / 2;
 const ObjectImages = [
   'resources/images/game/objects/square.png',
   'resources/images/game/objects/circle.png',
@@ -64,105 +57,59 @@ const ObjectImages = [
   'resources/images/game/objects/panda.png',
   'resources/images/game/objects/tiger.png'
 ];
-const TRIANGLE_POINTS = [
-  { x: 0 - 23.37, y: 0 - 40.32 },
-  { x: 69.93 - 23.37, y: 40.32 - 40.32 },
-  { x: 0 - 23.37, y: 80.64 - 40.32 }
-];
-const SQUARE_POINTS = [
-  { x: 28.8, y: 28.8 },
-  { x: 28.8, y: -28.8 },
-  { x: -28.8, y: 28.8 },
-  { x: -28.8, y: -28.8 }
-];
-/*
-const TIGER_POINTS = [
-  { x: 4.6, y: 96 },
-  { x: 30, y: 54.8 },
-  { x: 29, y: 22.9 },
-  { x: 55.1, y: 2.5 },
-  { x: 80.6, y: 2.9 },
-  { x: 99.9, y: 23.2 },
-  { x: 129.7, y: 19.6 },
-  { x: 165.7, y: 23.7 },
-  { x: 189.5, y: 1.6 },
-  { x: 221.6, y: 9.23 },
-  { x: 237.9, y: 38.5 },
-  { x: 231.9, y: 59.76 },
-  { x: 252.05, y: 94.12 },
-  { x: 254.1, y: 130.0 },
-  { x: 234.0, y: 181.0 },
-  { x: 160.4, y: 221.9 },
-  { x: 97.14, y: 222.63 },
-  { x: 35.5, y: 194.9 },
-  { x: 3.7, y: 135.0 }
-];
-*/
-
-const KITTY_POINTS: {} = [
-  { x: 28.8 * KITTY_SCALE, y: 20.36 * KITTY_SCALE },
-  { x: 28.8 * KITTY_SCALE, y: -20.36 * KITTY_SCALE },
-  { x: -28.8 * KITTY_SCALE, y: -20.36 * KITTY_SCALE },
-  { x: -28.8 * KITTY_SCALE, y: 20.36 * KITTY_SCALE },
-];
-const PANDA_POINTS: {} = [
-  { x: 28.8, y: 20.36 },
-  { x: 28.8, y: -20.36 },
-  { x: -28.8, y: -20.36 },
-  { x: -28.8, y: 20.36 },
-];
-const TIGER_POINTS: {} = [
-  { x: 28.8 * TIGER_SCALE, y: 20.36 * TIGER_SCALE },
-  { x: 28.8 * TIGER_SCALE, y: -20.36 * TIGER_SCALE },
-  { x: -28.8 * TIGER_SCALE, y: -20.36 * TIGER_SCALE },
-  { x: -28.8 * TIGER_SCALE, y: 20.36 * TIGER_SCALE },
-];
-
-
-
 
 export default class Application extends View {
   private game: Game;
   private pb: PachinkoBall[];
-
   private lines: any[];
-
   private pointing_dx: number;
   private pointing_dy: number;
-
   private time: number;
   private inShot: boolean;
-
   private ballsShot: number;
   private timeSinceStart: number;
-
   private obstaclePosX: number[][];
   private header: ImageView;
   private header_arrow: ImageView;
   private playfield: ImageView;
   private guide: View[];
   private ball: ImageView[];
-
-  // arrays of something
   private obstacles: any[];
   private shapeTypes: any[];
   private digits: any[];
-
   private lastSoundPlayedTime: number;
-
   private collisionsThisFrame: boolean;
-
   private linefield: any
-
-  private leftLine: ImageView;
-  private rightLine: ImageView;
-
   private cloud: ImageView[];
+  private physics: BallPhysics;
+  private hkPhysics: HKPhysics;
+  private bowl: ImageView;
+  private bowl_front: ImageView;
+  private deltaX: number;
+  private hill: ImageView;
+  private levels: Levels;
+  private currentLevel: number;
+  private currentBalls: number;
+  private hearts: ImageView[];
+  private scoreDigits: ImageView[];
+  private highScoreDigits: ImageView[];
+  private currentScore: number;
+  private types: number[][];
+  private highScore: number;
+  private message: ImageView;
+  private countdown: number;
+  private advance: boolean;
+  private collisionIndicators: any[];
+  private normalIndicators: any[];
+  secondary: any;
 
   constructor(opts) {
     super(opts);
 
     this.game = new Game();
+    this.physics = new BallPhysics();
+    this.hkPhysics = new HKPhysics();
+    this.levels = new Levels();
 
     this.lastSoundPlayedTime = Date.now();
 
@@ -170,7 +117,7 @@ export default class Application extends View {
     this.obstacles = [];
 
     this.pb = [];
-    for (let i = 0; i < NUM_BALLS; i++) {
+    for (let i = 0; i < MAX_BALLS; i++) {
       this.pb[i] = new PachinkoBall();
       this.pb[i].setPosition(50, 50);
       this.pb[i].setVelocity(0, 0);
@@ -179,42 +126,76 @@ export default class Application extends View {
 
     this.lines = [];
 
+    this.types = [];
+    for (let i = 0; i < 20; i++) {
+      this.types[i] = [];
+    }
+
+    this.advance = false;
+
     this.pointing_dx = 0;
     this.pointing_dy = 1;
-
     this.time = 0;
     this.inShot = false;
     this.ballsShot = 0;
-
+    this.currentBalls = 1;
     this.timeSinceStart = 0;
-
     this.generateGameData();
-
+    this.currentLevel = 0;
     this._startGame();
-    this.buildObstacleLines();
-
     device.screen.on('Resize', () => this._resize());
     this._resize();
 
     platform.startGameAsync();
+    this.currentScore = 0;
+    let t = localStorage.getItem('highscore' + getLevelName(this.currentLevel));
+    if (t === null) {
+      t = '0';
+    }
+    this.highScore = parseInt(t);
+    this.updateGUI();
+    drawScore(this.scoreDigits, 0);
+    drawScore(this.highScoreDigits, this.highScore);
   }
 
-  generateGameData () {
+  private _resize () { resize(device, this.playfield, this.style); }
+
+  //  0 = game active
+  //  1 = player cleared board
+  // -1 = player lost
+  private checkGameOver () {
+    for (let line = 0; line < 20; line++) {
+      this.obstaclePosX[line] = [];
+      const obstaclesInLine = 5 + (line & 1);
+      for (let obj = 0; obj < obstaclesInLine; obj++) {
+        if (this.obstacles[line][obj].style.visible) {
+          if (yOfLine(line, this.linefield) < 150) {
+            return -1
+          } else {
+            return 0;
+          }
+        }
+      }
+    }
+    return 1;
+  }
+
+  private generateGameData () {
     this.obstaclePosX = [];
     for (let line = 0; line <= 1; line++) {
       this.obstaclePosX[line] = [];
-      for (let obj = 0; obj < 6; obj++) {
+      const obstaclesInLine = 5 + (line & 1);
+      for (let obj = 0; obj < obstaclesInLine; obj++) {
         this.obstaclePosX[line][obj] = 130 - OBJECT_WIDTH / 2 * (line & 1) + obj * OBJECT_WIDTH;
-        //console.log(line, obj, this.obstaclePosX[line][obj]);
       }
     }
   }
 
-  updateGuide (position) {
+  private updateGuide (position) {
     const sourceX = LAUNCH_X;
     const sourceY = LAUNCH_Y;
-    const pos = this.screenToPlayfield(position);
-    pos.y = max(pos.y, LAUNCH_Y + 10);
+    const pos = screenToPlayfield(position, this.playfield);
+    pos.y = max(pos.y, LAUNCH_Y + 100);
     let dx = pos.x - sourceX;
     let dy = pos.y - sourceY;
     let sumSquares = dx * dx + dy * dy;
@@ -234,13 +215,6 @@ export default class Application extends View {
     }
   }
 
-  screenToPlayfield (p) {
-    return {
-      x: (p.x - this.playfield.style.offsetX) / this.playfield.style.scale,
-      y: (p.y - this.playfield.style.offsetY) / this.playfield.style.scale
-    }
-  }
-
   onInputStart (event, position) {
     if (!this.inShot) {
       this.updateGuide(position);
@@ -256,12 +230,13 @@ export default class Application extends View {
         this.guide[i].style.visible = false;
       }
       this.inShot = true;
-      this.ballsShot = 10;
+      this.ballsShot = this.currentBalls;
       for (let i = 0; i < this.ballsShot; i++) {
         this.pb[i].setPreCollision(true);
         this.pb[i].setDelay(i * 150);
         this.pb[i].setPosition(LAUNCH_X, LAUNCH_Y);
         this.pb[i].setVelocity(this.pointing_dx, this.pointing_dy);
+        this.pb[i].setType('default');
       }
     }
   }
@@ -275,67 +250,83 @@ export default class Application extends View {
     }
   }
 
-  _resize () {
-    const screen = device.screen;
-    const screenWidth = screen.width;
-    const screenHeight = screen.height;
-    const GAMEPLAY_ASPECT = GAMEPLAY_HEIGHT / GAMEPLAY_WIDTH;
-    const SCREEN_ASPECT = screenHeight / screenWidth;
-
-    this.style.width = screenWidth;
-    this.style.height = screenHeight;
-
-    if (this.playfield) {
-      if (GAMEPLAY_ASPECT > SCREEN_ASPECT) {
-        const mult = screenHeight / GAMEPLAY_HEIGHT;
-        this.playfield.style.scale = mult;
-        this.playfield.style.offsetX = (screenWidth - (GAMEPLAY_WIDTH * mult)) / 2;
-        this.playfield.style.offsetY = 0;
-
-      } else {
-        const mult = screenWidth / GAMEPLAY_WIDTH;
-        this.playfield.style.scale = mult;
-        this.playfield.style.offsetX = 0;
-        this.playfield.style.offsetY = (screenHeight - (GAMEPLAY_HEIGHT * mult)) / 2;
-      }
+  private incrementScore () {
+    this.currentScore++;
+    if (this.currentScore > this.highScore) {
+      this.highScore = this.currentScore;
     }
-
-    //console.log(screenWidth, screenHeight);
+    drawScore(this.scoreDigits, this.currentScore);
+    drawScore(this.highScoreDigits, this.highScore);
   }
 
   _tick (dt) {
     this.game.tick(dt);
     this.timeSinceStart += dt;
 
-    // warning. danger zone
+    for (let i = 0; i < dt; i++) {
+      this.timeSinceStart++;
+
+      //move bowl
+      this.bowl.style.x = sin(this.timeSinceStart * .0005) * 180 + 290;
+      this.deltaX = this.bowl.style.x - this.bowl_front.style.x;
+      this.bowl_front.style.x = this.bowl.style.x;
+    }
+
+    // warning. danger zone flashing
     for (let line = 0; line < 20; line++) {
-      if (this.yOfLine(line) < 150) {
-        for (let i = 0; i < 6; i++) {
+      if (yOfLine(line, this.linefield) < 150) {
+        const obstaclesInLine = 5 + (line & 1);
+        for (let i = 0; i < obstaclesInLine; i++) {
           this.obstacles[line][i].style.opacity = ((this.timeSinceStart >> 7) & 1) * 0.5 + .25;
         }
       }
     }
 
-    const cloudSpeed = [.01, .005, .003];
-    for (let i = 0; i < 3; i++) {
-      let x = this.cloud[i].style.x;
-      x += cloudSpeed[i] * dt;
-      if (x > 600) {
-        x = - 300;
+    // decrement all the object hit counters
+    for (let line = 0; line < 20; line++) {
+      const obstaclesInLine = 5 + (line & 1);
+      for (let i = 0; i < obstaclesInLine; i++) {
+        const t = this.obstacles[line][i];
+        if (t.countdown > 0) {
+          t.countdown = max(0, t.countdown - dt)
+        }
       }
-      this.cloud[i].style.x = x;
     }
 
+    updateClouds(this.cloud, dt);
+
+    if (this.countdown > 0) {
+      this.countdown -= dt;
+      const t = this.countdown / MESSAGE_DURATION;
+      const u = 1 - t;
+      this.message.style.opacity = t;
+      this.message.style.scale = 2 - t;
+      this.message.style.r = u * u * u * u;
+      if (this.countdown <= 0) {
+        this.countdown = 0;
+        this.message.style.visible = false;
+        if (this.advance) {
+          this.currentLevel++;
+          if (this.currentLevel === 5) {
+            this.currentLevel = 0;
+          }
+          this.setupLevel(this.currentLevel);
+        }
+      }
+      return;
+    }
+
+    let ballsToAdd = 0;
     if (this.inShot) {
       // if I need to fire any balls, do it
       for (let i = 0; i < dt; i++) {
         for (let ball = 0; ball < this.ballsShot; ball++) {
-          const d = this.pb[ball].getDelay();
-          if (d > 0) {
-            this.pb[ball].setDelay(d - 1);
+          const delay = this.pb[ball].getDelay();
+          if (delay > 0) {
+            this.pb[ball].setDelay(delay - 1);
           }
 
-          if (d === 0) {
+          if (delay === 0) {
             this.ball[ball].style.visible = true;
             this.pb[ball].setGravityActive(!this.pb[ball].preCollision);
 
@@ -343,83 +334,90 @@ export default class Application extends View {
             const n = { x: d.x + d.dx, y: d.y + d.dy };
 
             //left and right walls
-            if ((n.x < 20) || (n.x > GAMEPLAY_WIDTH - 20)) {
+            if ((n.x < 16) || (n.x > GAMEPLAY_WIDTH - 16)) {
               this.pb[ball].setVelocity(-d.dx * .6, d.dy * .8);
               this.pb[ball].preCollision = false;
+              this.collisionsThisFrame = true;
             }
 
             //ceiling
-            if (n.y < 110 && d.dy < 0) {
+            if (n.y < 0 && d.dy < 0) {
               this.pb[ball].setVelocity(d.dx * .8, -d.dy * .6);
               this.pb[ball].preCollision = false;
+              this.collisionsThisFrame = true;
+            }
+
+            //bucket
+            const BUCKET_OFFX = 65;
+            if (n.y > 930 && n.y < 970) {
+              // in the range where I might be hitting the lip of the bowl
+
+              let dx = this.bowl.style.x - BUCKET_OFFX - n.x;
+              let dy = 950 - n.y;
+              let sumSquares = dx * dx + dy * dy;
+              if (sumSquares < BALL_RADIUS * BALL_RADIUS * 1.2) {
+                const t = this.physics.ballVsPoint(n.x, n.y, d.dx, d.dy, this.bowl.style.x - BUCKET_OFFX, 950, .5);
+                this.pb[ball].setVelocity(t.dx, t.dy);
+                this.pb[ball].preCollision = false;
+              }
+
+              dx = this.bowl.style.x + BUCKET_OFFX - n.x;
+              dy = 950 - n.y;
+              sumSquares = dx * dx + dy * dy;
+              if (sumSquares < BALL_RADIUS * BALL_RADIUS * 1.2) {
+                const t = this.physics.ballVsPoint(n.x, n.y, d.dx, d.dy, this.bowl.style.x + BUCKET_OFFX, 950, .5);
+                this.pb[ball].setVelocity(t.dx, t.dy);
+                this.pb[ball].preCollision = false;
+              }
+            }
+
+            //if in the bucket, get rid of it
+            if (n.y > 970 && n.x > this.bowl.style.x - BUCKET_OFFX && n.x < this.bowl.style.x + BUCKET_OFFX) {
+              this.pb[ball].setPosition(n.y, 1200);
+              this.incrementScore();
             }
 
             //objects
+            const collisionCutOff = 900;
             let collisionsThisFrame = false;
             for (let line = 0; line < 20; line++) {
-              if (this.roughCheckCollision(n.x, n.y, line) && this.yOfLine(line) < 1010) {
-                for (let i = 0; i < 6; i++) {
+              if (this.roughCheckCollision(n.x, n.y, line) && yOfLine(line, this.linefield) < collisionCutOff) {
+                const obstaclesInLine = 5 + (line & 1);
+                for (let i = 0; i < obstaclesInLine; i++) {
                   const ob = this.obstacles[line][i].style;
                   if (ob.visible) {
                     const type = this.shapeTypes[line][i];
                     switch (type) {
-                      case 0: //square
-                      case 2: //triangle
-                      case 3: //kitty
-                      case 4: //panda
-                      case 5: //tiger
-                        if (this.circumscribedCircleCheck(n.x, n.y, line, i)) {
-                          const p = this.findCollisionPoint(n.x, n.y, line, i);
-                          const dx = p.x - n.x;
-                          const dy = p.y - n.y;
-                          const sumSquares = dx * dx + dy * dy;
-                          if (sumSquares < BALL_RADIUS * BALL_RADIUS) {
-                            this.obstacles[line][i].value--;
-
-
-                            if (Date.now() - this.lastSoundPlayedTime >= CONTACT_SOUND_THRESHOLD) {
-                              this.lastSoundPlayedTime = Date.now();
-                              sounds.playSound('contact');
-                            }
-
-                            animate(this.obstacles[line][i])
-                              .now({ scale: .95 }, 50, animate.easeInOutSine)
-                              .then({ scale: 1.0 }, 50, animate.easeInOutSine)
-                            setValue(this.digits[line][i], this.obstacles[line][i].value, DIGITS_SCALE);
-                            if (!this.obstacles[line][i].value) {
-                              ob.visible = false;
-                            }
-                            const t = this.ballVsPoint(n.x, n.y, d.dx, d.dy, p.x, p.y, .8);
-                            this.pb[ball].setVelocity(t.dx, t.dy);
-                            this.pb[ball].preCollision = false;
-                            this.collisionsThisFrame = true;
-                          }
-                        }
-                        break;
-                      case 1: //circle
+                      case 0: //circle
                         {
                           const a = this.circumscribedCircleCheck(d.x, d.y, line, i);
                           const b = this.circumscribedCircleCheck(n.x, n.y, line, i);
 
                           if (a || b) {
-                            this.obstacles[line][i].value--;
-                            animate(this.obstacles[line][i])
-                              .now({ scale: .95 }, 50, animate.easeInOutSine)
-                              .then({ scale: 1.0 }, 50, animate.easeInOutSine)
-                            setValue(this.digits[line][i], this.obstacles[line][i].value, DIGITS_SCALE);
-                            if (!this.obstacles[line][i].value) {
-                              ob.visible = false;
+                            if (this.obstacles[line][i].countdown === 0) {
+                              this.obstacles[line][i].countdown = HIT_DELAY;
+                              this.obstacles[line][i].value--;
+                              this.incrementScore();
+                              sounds.playSound('contact');
+                              animate(this.obstacles[line][i])
+                                .now({ scale: .95 }, 50, animate.easeInOutSine)
+                                .then({ scale: 1.0 }, 50, animate.easeInOutSine)
+                              setValue(this.digits[line][i], this.obstacles[line][i].value, DIGITS_SCALE);
+                              if (!this.obstacles[line][i].value) {
+                                ob.visible = false;
+                                this.secondary[line][i].style.visible = false;
+                              }
                             }
                           }
 
                           if (!a && b) {
                             const dx = ob.x - n.x;
-                            const dy = ob.y + this.yOfLine(line) - n.y;
+                            const dy = ob.y + yOfLine(line, this.linefield) - n.y;
                             const len = sqrt(dx * dx + dy * dy);
                             const px = dx / len * BALL_RADIUS + n.x;
                             const py = dy / len * BALL_RADIUS + n.y;
 
-                            const t = this.ballVsPoint(n.x, n.y, d.dx, d.dy, px, py, .8);
+                            const t = this.physics.ballVsPoint(n.x, n.y, d.dx, d.dy, px, py, .72);
                             this.pb[ball].setVelocity(t.dx, t.dy);
                             this.pb[ball].preCollision = false;
                             this.collisionsThisFrame = true;
@@ -427,6 +425,45 @@ export default class Application extends View {
                         }
                         break;
                       default:
+                        if (this.circumscribedCircleCheck(n.x, n.y, line, i)) {
+                          const p = this.findCollisionPoint(n.x, n.y, line, i);
+                          const deltaX = d.x - p.x;
+                          const deltaY = d.y - p.y;
+                          if ((deltaX * d.dx) + (deltaY * d.dy) < 0) {
+                            const dx = p.x - n.x;
+                            const dy = p.y - n.y;
+                            const sumSquares = dx * dx + dy * dy;
+                            if (sumSquares < BALL_RADIUS * BALL_RADIUS) {
+                              if (this.obstacles[line][i].countdown === 0) {
+                                this.obstacles[line][i].countdown = HIT_DELAY;
+                                this.obstacles[line][i].value--;
+                                this.incrementScore();
+                                sounds.playSound('contact');
+                                animate(this.obstacles[line][i])
+                                  .now({ scale: .95 }, 50, animate.easeInOutSine)
+                                  .then({ scale: 1.0 }, 50, animate.easeInOutSine)
+                                setValue(this.digits[line][i], this.obstacles[line][i].value, DIGITS_SCALE);
+                                if (!this.obstacles[line][i].value) {
+                                  ob.visible = false;
+                                  this.secondary[line][i].style.visible = false;
+                                }
+                              }
+                              const cor = this.levels.shapeData[type].cor;
+                              const t = this.physics.ballVsPoint(n.x, n.y, d.dx, d.dy, p.x, p.y, cor);                              
+                              this.pb[ball].setVelocity(t.dx, t.dy);
+                              this.pb[ball].preCollision = false;
+                              this.collisionsThisFrame = true;
+                              if (type === 15) {
+                                ballsToAdd++;
+                              }
+                              if (type === 7) {
+                                this.pb[ball].setType('rocket');
+                              } else if (this.pb[ball].getType() === 'rocket') {
+                                this.pb[ball].setType('default');
+                              }
+                            }
+                          }
+                        }
                         break;
                     }
                   }
@@ -466,247 +503,128 @@ export default class Application extends View {
         this.moveLinesUp();
       }
     }
+
+    this.currentBalls = min(this.currentBalls + ballsToAdd, MAX_BALLS);
+    this.updateGUI();
   }
 
-
-  // returns yMin
-  yOfLine (line) {
-    return this.linefield[line].style.y;
-  }
-
-  closestTwo (x, y, p) {
-    let small = [Number.MAX_VALUE, 0, 0];
-    let smallest = [Number.MAX_VALUE, 0, 0];
-    for (let i = 0; i < p.length; i++) {
-      const px = p[i].x;
-      const py = p[i].y;
-      const dx = x - px;
-      const dy = y - py;
-      const d = dx * dx + dy * dy;
-      if (d < smallest[0]) {
-        small = smallest;
-        smallest = [d, px, py];
-      } else if (d < small[0]) {
-        small = [d, px, py];
-      }
-    }
-    return { p0: { x: smallest[1], y: smallest[2] }, p1: { x: small[1], y: small[2] } };
-  }
-
-  closestOutlinePoint (x: number, y: number, p): number {
-    let small: number = Number.MAX_VALUE;
-    let index: number;
-    for (let i: number = 0; i < p.length; i++) {
-      const px: number = p[i].x;
-      const py: number = p[i].y;
-      const dx: number = x - px;
-      const dy: number = y - py;
-      const d: number = dx * dx + dy * dy;
-      if (d < small) {
-        small = d;
-        index = i;
-      }
-    }
-    return index;
-  }
-
-  findBouncePoint (x, y, p) {
-    const index = this.closestOutlinePoint(x, y, p);
-
-    // do the clockwise and counterclockwise adjacent points
-    const a = this.interpolateClosestOfPair(x, y, p[index], p[(index + 1) % p.length]);
-    const b = this.interpolateClosestOfPair(x, y, p[index], p[(index - 1 + p.length) % p.length]);
-
-    if (a.x === p[index].x && a.y === p[index].y) {
-      return b;
-    } else {
-      return a;
-    }
-  }
-
-  // binary search to find closest point
-  interpolateClosestOfPair (x, y, p0, p1) {
-    let ax = p0.x;
-    let ay = p0.y;
-    let bx = p1.x;
-    let by = p1.y;
-    let d0 = (ax - x) * (ax - x) + (ay - y) * (ay - y);
-    let d1 = (bx - x) * (bx - x) + (by - y) * (by - y);
-
-    for (let iter = 0; iter < 6; iter++) {
-      const tx = (ax + bx) * .5
-      const ty = (ay + by) * .5;
-      if (d0 < d1) {
-        bx = tx;
-        by = ty;
-      } else {
-        ax = tx;
-        ay = ty;
-      }
-      d0 = (ax - x) * (ax - x) + (ay - y) * (ay - y);
-      d1 = (bx - x) * (bx - x) + (by - y) * (by - y);
-    }
-    if (d0 < d1) {
-      return { x: ax, y: ay };
-    } else {
-      return { x: bx, y: by };
-    }
-  }
-
-  //to do: at some point, should init the corners based
-  //  on the rotation of the objects. avoid the trig
-  // USES TRIANGLE_POINTS and SQUARE_POINTS
-  findCollisionPoint (ballX, ballY, line, obstacle) {
+  private findCollisionPoint (ballX, ballY, line, obstacle) {
     const ob = this.obstacles[line][obstacle].style;
-    //might need TAU - r. Needs test
     const s = sin(ob.r);
     const c = cos(ob.r);
 
-
     const type = this.shapeTypes[line][obstacle];
     const obstacleX = this.obstacles[line][obstacle].style.x;
-    const obstacleY = this.obstacles[line][obstacle].style.y + this.yOfLine(line);
+    const obstacleY = this.obstacles[line][obstacle].style.y + yOfLine(line, this.linefield);
 
     let rotatedPoints = [];
     let t, u;
     switch (type) {
-      case 0: // square
-
+      case 0: // circle
+        break;
+      case 1: // square
         for (let i = 0; i < 4; i++) {
-          const x = SQUARE_POINTS[i].x;
-          const y = SQUARE_POINTS[i].y;
-          rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
+          const x = this.hkPhysics.SQUARE_POINTS[i].x;
+          const y = this.hkPhysics.SQUARE_POINTS[i].y;
+          const tx = x * c - y * s + obstacleX;
+          const ty = y * c + x * s + obstacleY;
+          if (SHOW_COLLISIONS) {
+            this.collisionIndicators[i].style.x = tx;
+            this.collisionIndicators[i].style.y = ty;
+          }
+          rotatedPoints[i] = { x: tx, y: ty };
         }
-        t = this.closestTwo(
+        t = this.physics.closestTwo(
           ballX, ballY,
           [rotatedPoints[0],
           rotatedPoints[1],
           rotatedPoints[2],
           rotatedPoints[3]]
         );
-        u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
+        u = this.physics.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
+        drawNormal(u, { x: ballX, y: ballY }, this.normalIndicators);
         return u;
-      case 1: // circle
-        break;
       case 2: // triangle
         for (let i = 0; i < 3; i++) {
-          const x = TRIANGLE_POINTS[i].x;
-          const y = TRIANGLE_POINTS[i].y;
-          rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
+          const x = this.hkPhysics.TRIANGLE_POINTS[i].x;
+          const y = this.hkPhysics.TRIANGLE_POINTS[i].y;
+          const tx = x * c - y * s + obstacleX;
+          const ty = y * c + x * s + obstacleY;
+          if (SHOW_COLLISIONS) {
+            this.collisionIndicators[i].style.x = tx;
+            this.collisionIndicators[i].style.y = ty;
+          }
+          rotatedPoints[i] = { x: tx, y: ty };
         }
-        t = this.closestTwo(
+        t = this.physics.closestTwo(
           ballX, ballY,
           [rotatedPoints[0],
           rotatedPoints[1],
           rotatedPoints[2]]
         );
-        u = this.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
+        u = this.physics.interpolateClosestOfPair(ballX, ballY, t.p0, t.p1);
+        drawNormal(u, { x: ballX, y: ballY }, this.normalIndicators);
         return u;
-      case 3: // kitty
+      default: // kitty
         for (let i = 0; i < 4; i++) {
-          const x = KITTY_POINTS[i].x;
-          const y = KITTY_POINTS[i].y;
-          rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
+          const x = this.hkPhysics.KITTY_POINTS[i].x;
+          const y = this.hkPhysics.KITTY_POINTS[i].y;
+          const tx = x * c - y * s + obstacleX;
+          const ty = y * c + x * s + obstacleY;
+          if (SHOW_COLLISIONS) {
+            this.collisionIndicators[i].style.x = tx;
+            this.collisionIndicators[i].style.y = ty;
+          }
+          rotatedPoints[i] = { x: tx, y: ty };
         }
-        return this.findBouncePoint(ballX, ballY, rotatedPoints);
-      case 4: // panda
-        for (let i = 0; i < 4; i++) {
-          const x = PANDA_POINTS[i].x;
-          const y = PANDA_POINTS[i].y;
-          rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
-        }
-        return this.findBouncePoint(ballX, ballY, rotatedPoints);
-      case 5: // tiger
-        for (let i = 0; i < 4; i++) {
-          const x = TIGER_POINTS[i].x;
-          const y = TIGER_POINTS[i].y;
-          rotatedPoints[i] = { x: x * c - y * s + obstacleX, y: y * c + x * s + obstacleY };
-        }
-        return this.findBouncePoint(ballX, ballY, rotatedPoints);
+        u = this.physics.findBouncePoint(ballX, ballY, rotatedPoints);
+        drawNormal(u, { x: ballX, y: ballY }, this.normalIndicators);
+        return u;
     }
   }
 
-  /**
-   * collide ball against a point and return new velocity
-   *
-   * @param bx ball x
-   * @param by ball y
-   * @param vx vel x
-   * @param vy vel y
-   * @param px point x
-   * @param py point y
-   * @param cor coefficient of restitution
-   */
-  ballVsPoint (bx, by, vx, vy, px, py, cor) {
-    let dx = px - bx;
-    let dy = py - by;
-    const mult = 1.0 / sqrt(dx * dx + dy * dy);
-    dx *= mult;
-    dy *= mult;
-    const dot = (vx * dx + vy * dy) * cor;
-    const dotx = dx * dot;
-    const doty = dy * dot;
 
-    const newDX = vx - dotx - dotx;
-    const newDY = vy - doty - doty;
-
-    return { dx: newDX, dy: newDY };
-  }
-
-  circumscribedCircleCheck (x, y, line, obstacle) {
+  private circumscribedCircleCheck (x, y, line, obstacle) {
     const SLOP = 1.1;
     const ob = this.obstacles[line][obstacle].style;
     let sumOfRadii;
     let res = false;
     const dx = x - ob.x;
-    const dy = y - (this.yOfLine(line) + ob.y);
+    const dy = y - (yOfLine(line, this.linefield) + ob.y);
     const sumOfSquares = dx * dx + dy * dy;
     const type = this.shapeTypes[line][obstacle];
     switch (type) {
-      case 0: //square
-        sumOfRadii = ((57.6 / 2) + BALL_RADIUS * sqrt(2)) * SLOP;
-        res = sumOfSquares < sumOfRadii * sumOfRadii;
-        break;
-      case 1: //circle
+      case 0: //circle
         sumOfRadii = ((57.6 / 2) + BALL_RADIUS);
         res = sumOfSquares < sumOfRadii * sumOfRadii;
-
-        //console.log(dx, dy, sumOfSquares, sumOfRadii * sumOfRadii);
+        break;
+      case 1: //square
+        sumOfRadii = ((57.6 / 2) + BALL_RADIUS * sqrt(2)) * SLOP;
+        res = sumOfSquares < sumOfRadii * sumOfRadii;
         break;
       case 2: //triangle
         sumOfRadii = (80.64 * (1 - 1 / sqrt(3)) + BALL_RADIUS) * 1.2;
         res = sumOfSquares < sumOfRadii * sumOfRadii;
         break;
-      case 3: //kitty
-        sumOfRadii = ((57.6 / 2 * KITTY_SCALE) + BALL_RADIUS * sqrt(2)) * SLOP;
+      default: //kitty
+        sumOfRadii = ((57.6 / 2 * this.hkPhysics.KITTY_SCALE) + BALL_RADIUS * sqrt(2)) * SLOP;
         res = sumOfSquares < sumOfRadii * sumOfRadii;
-        break;
-      case 4: //panda
-        sumOfRadii = ((57.6 / 2) + BALL_RADIUS * sqrt(2)) * SLOP;
-        res = sumOfSquares < sumOfRadii * sumOfRadii;
-        break;
-      case 5: //tiger
-        sumOfRadii = ((57.6 / 2 * TIGER_SCALE) + BALL_RADIUS * sqrt(2)) * SLOP;
-        res = sumOfSquares < sumOfRadii * sumOfRadii;
-        break;
-      default:
-        console.log("Warning: Unrecognized shape " + type);
         break;
     }
     return res;
   }
 
-
   // possibly touching anything in this line?
-  roughCheckCollision (x, y, line) {
+  private roughCheckCollision (x, y, line) {
     // first filter -- is the ball in the line's y range?
-    const yMin = this.yOfLine(line) - 10; //slop for overlap
+    const yMin = yOfLine(line, this.linefield) - 10; //slop for overlap
     const yMax = yMin + LINE_HEIGHT + 10; //slop for overlap
     //console.log(y, yMin, yMax);
     if (between(y, yMin - BALL_RADIUS, yMax + BALL_RADIUS)) {
       // second filter -- is the ball in the obstacle's x range?
       //console.log("Y_TOUCH");
-      for (let obstacle = 0; obstacle < 6; obstacle++) {
+      const obstaclesInLine = 5 + (line & 1);
+      for (let obstacle = 0; obstacle < obstaclesInLine; obstacle++) {
         // is this obstacle visible?
         const ob = this.obstacles[line][obstacle].style;
         if (ob.visible) {
@@ -725,46 +643,120 @@ export default class Application extends View {
     return false;
   }
 
-  moveLinesUp () {
-    for (let i = 0; i < this.linefield.length; i++) {
-      const y = this.linefield[i].style.y;
-      animate(this.linefield[i])
-        .wait(i * 15)
-        .then({ y: y - LINE_HEIGHT }, 500, animate.easeInOutSine);
+  private moveLinesUp () {
+    localStorage.setItem('highscore' + getLevelName(this.currentLevel), this.highScore + '');
+    const result = this.checkGameOver();
+    if (result === 0) { // game not over
+      //for kitties who do something when the shot is over.
+      for (let line = 0; line < 20; line++) {
+        const obstaclesInLine = 5 + (line & 1);
+        for (let object = 0; object < obstaclesInLine; object++) {
+          if (this.types[line][object] === 11) {
+            this.obstacles[line][object].style.r += 1 / 24 * TAU;
+          }
+          if (this.types[line][object] === 19) {
+            this.obstacles[line][object].style.r *= -1;
+          }
+        }
+      }
+      for (let i = 0; i < this.linefield.length; i++) {
+        const y = this.linefield[i].style.y;
+        animate(this.linefield[i])
+          .wait(i * 15)
+          .then({ y: y - LINE_HEIGHT }, 500, animate.easeInOutSine);
+      }
+      setTimeout(() => {
+        sounds.playSound('line');
+      }, 500);
+    } else if (result === 1) { // player won
+      setMessage(this.message, 0);
+      this.countdown = MESSAGE_DURATION;
+      this.advance = true;
+    } else { //player lost
+      setMessage(this.message, 1);
+      this.countdown = MESSAGE_DURATION;
+      this.setupLevel(this.currentLevel);
+      this.advance = false;
     }
-
-    setTimeout(() => {
-      sounds.playSound('line');
-    }, 500);
   }
 
-  resetFilterToYellow () {
+  private setupLevel (levelNumber: number) {
+    let y = 800;
+    this.currentBalls = this.levels.numBalls[levelNumber];
     for (let line = 0; line < 20; line++) {
-      for (let obstacle = 0; obstacle < 6; obstacle++) {
-        this.obstacles[line][obstacle].setFilter(yellowFilter);
+      this.linefield[line].style.y = y;
+      y += LINE_HEIGHT;
+      const obstaclesInLine = 5 + (line & 1);
+      for (let object = 0; object < obstaclesInLine; object++) {
+        const d = this.levels.getData(levelNumber, line, object);
+        if (d) {
+          let name = d.type;
+          let type = this.levels.indexmap[name];
+          this.types[line][object] = type;
+          let angle = d.angle / 24 * TAU;
+          this.obstacles[line][object].setImage('resources/images/game/' + this.levels.filemap[d.type]);
+          this.obstacles[line][object].style.r = angle;
+          this.obstacles[line][object].style.visible = true;
+          this.obstacles[line][object].style.opacity = d.opacity;
+          if (d.secondary) {
+            console.log("found a secondary", d.secondary);
+            this.secondary[line][object].setImage('resources/images/game/' + this.levels.filemap[d.secondary]);
+            this.secondary[line][object].style.r = 0;
+            this.secondary[line][object].style.visible = true;
+            center(this.secondary[line][object], .25);
+            this.secondary[line][object].style.opacity = 1;
+          }
+
+          let scale = IMAGE_SCALE;
+          if (type === 2) {
+            scale = TRIANGLE_SCALE;
+          }
+          if (type > 2) {
+            scale *= this.hkPhysics.KITTY_SCALE;
+          }
+
+          center(this.obstacles[line][object], scale);
+          //triangles are different
+          if (type === 2) {
+            const t = 23.37;
+            this.obstacles[line][object].style.offsetX = -t;
+            this.obstacles[line][object].style.anchorX = t;
+          }
+
+          const value = d.points;
+          setValue(this.digits[line][object], value, DIGITS_SCALE);
+          this.obstacles[line][object].value = value;
+          this.obstacles[line][object].countdown = 0;
+          this.shapeTypes[line][object] = type;
+        } else {
+          this.types[line][object] = -1;
+          this.obstacles[line][object].style.visible = false;
+          setValue(this.digits[line][object], 0, DIGITS_SCALE);
+          this.obstacles[line][object].value = 0;
+        }
       }
     }
-  }
-
-  spinObjects (dt) {
-    let angle = (this.timeSinceStart / 1000) | 0;
-    angle %= 3;
-
-    angle *= TAU / 3;
-    for (let line = 0; line < 20; line++) {
-      for (let object = 0; object < 6; object++) {
-        this.obstacles[line][object].style.r = angle;
-      }
+    this.updateGUI();
+    this.currentScore = 0;
+    let t = localStorage.getItem('highscore' + getLevelName(this.currentLevel));
+    if (t === null) {
+      t = '0';
     }
+    this.highScore = parseInt(t);
+    this.updateGUI();
+    drawScore(this.highScoreDigits, this.highScore);
+    drawScore(this.scoreDigits, this.currentScore);
   }
 
-  buildObstacleLines () {
+  private buildObstacleLines (levelNumber: number) {
+    const level = this.levels.layout[levelNumber];
+
     this.linefield = [];
     this.obstacles = [];
+    this.secondary = [];
     this.digits = [];
     this.shapeTypes = [];
     let y = 800;
-    let activeCount = 0;
     for (let line = 0; line < 20; line++) {
       this.shapeTypes[line] = [];
       this.linefield[line] = new ImageView({
@@ -776,77 +768,98 @@ export default class Application extends View {
       });
       y += LINE_HEIGHT;
       this.obstacles[line] = [];
+      this.secondary[line] = [];
       this.digits[line] = [];
 
       let x = 130 - OBJECT_WIDTH / 2 * (line & 1);
+
       const obstaclesInLine = 5 + (line & 1);
-      for (let object = 0; object < 6; object++) {
-        let active = object < obstaclesInLine && random() > .5;
-        let type = rollInt(3, 5);
+      for (let object = 0; object < obstaclesInLine; object++) {
+        const d = this.levels.getData(levelNumber, line, object);
+        let type = 0;
+        let name = '';
+        let angle = 0;
 
-        //1/5 of the time, use 0 degrees rotation, else randomly choose a rotation that's
-        // not too terribly far from 0
-        let angle = (rollInt(0, 6) - 3) / 24 * TAU;
-        if (random() < .2) {
-          angle = 0;
-        }
-
+        //object
         this.obstacles[line][object] = new ImageView({
           parent: this.linefield[line],
-          image: ObjectImages[type],
           x: x,
           y: LINE_HEIGHT / 2,
           autoSize: true,
-          visible: active,
-          r: angle
+          visible: !!d,
         });
-        this.shapeTypes[line][object] = type;
-        x += OBJECT_WIDTH;
-        //this.obstacles[line][object].setFilter(yellowFilter);
 
-        let scale = IMAGE_SCALE;
-        if (type === 2) {
-          scale = TRIANGLE_SCALE;
-        }
-        if (type === 3) {
-          scale *= KITTY_SCALE;
-        }
-        if (type === 5) {
-          scale *= TIGER_SCALE;
-        }
-        center(this.obstacles[line][object], scale);
-        //triangles are different
-        if (type === 2) {
-          const t = 23.37; // WHY? this.obstacles[line][object].style.width * TRIANGLE_CENTER;
-          this.obstacles[line][object].style.offsetX = -t;
-          this.obstacles[line][object].style.anchorX = t;
-        }
+        this.secondary[line][object] = new ImageView({
+          parent: this.linefield[line],
+          x: x,
+          y: LINE_HEIGHT / 2,
+          autoSize: true,
+          visible: false,
+        });
 
+        //digits
         this.digits[line][object] = [];
         for (let j = 0; j < 3; j++) {
           this.digits[line][object][j] = new ImageView({
             parent: this.linefield[line],
-            x: this.obstacles[line][object].style.x + j * 15 - 15 + 25,
-            y: this.obstacles[line][object].style.y + 25,
+            x: x + j * 15 - 15 + 25,
+            y: LINE_HEIGHT / 2 + 25,
             autoSize: true,
-            visible: active,
+            visible: true,
           });
         }
-        if (active) {
-          const value = rollInt(1, 45);
+        x += OBJECT_WIDTH;
+
+        if (d) {
+          name = d.type;
+          type = this.levels.indexmap[name];
+          angle = d.angle / 24 * TAU;
+          this.obstacles[line][object].setImage('resources/images/game/' + this.levels.filemap[d.type]);
+          this.obstacles[line][object].style.r = angle;
+          this.obstacles[line][object].style.opacity = d.opacity;
+
+          let scale = IMAGE_SCALE;
+          if (type === 2) {
+            scale = TRIANGLE_SCALE;
+          }
+          if (type > 2) {
+            scale *= this.hkPhysics.KITTY_SCALE;
+          }
+
+          center(this.obstacles[line][object], scale);
+          //triangles are different
+          if (type === 2) {
+            const t = 23.37; // this number ensures correct triangle rotation
+            this.obstacles[line][object].style.offsetX = -t;
+            this.obstacles[line][object].style.anchorX = t;
+          }
+
+          const value = d.points;
           setValue(this.digits[line][object], value, DIGITS_SCALE);
           this.obstacles[line][object].value = value;
-          activeCount++;
+          this.obstacles[line][object].countdown = 0;
+        } else {
+          setValue(this.digits[line][object], 0, DIGITS_SCALE);
+          this.obstacles[line][object].value = 0;
         }
 
+        this.shapeTypes[line][object] = type;
       }
     }
   }
 
+  private updateGUI () {
+    let separation = 16;
+    if (this.currentBalls > 12) {
+      separation = 160 / this.currentBalls;
+    }
+    for (let i = 0; i < MAX_BALLS; i++) {
+      this.hearts[i].style.visible = i < this.currentBalls;
+      this.hearts[i].style.x = 360 + i * separation;
+    }
+  }
 
-
-
-  _startGame () {
+  private _startGame () {
     this.playfield = new ImageView({
       parent: this,
       image: 'resources/images/game/background/background.png',
@@ -879,23 +892,16 @@ export default class Application extends View {
       })
     }
 
-    this.ball = [];
-    const d = BALL_DIAMETER * 1.3;
-    for (let i = 0; i < NUM_BALLS; i++) {
-      this.ball[i] = new ImageView({
-        parent: this.playfield,
-        image: 'resources/images/game/objects/heart.png',
-        x: 0,
-        y: 0,
-        width: d,
-        height: d,
-        offsetX: -d / 2,
-        offsetY: -d / 2,
-        anchorX: d / 2,
-        anchorY: d / 2,
-        visible: false,
-      });
-    }
+    this.buildObstacleLines(this.currentLevel);
+
+    this.hill = new ImageView({
+      parent: this.playfield,
+      image: 'resources/images/game/background/background_hill.png',
+      x: 0,
+      y: 0,
+      width: GAMEPLAY_WIDTH,
+      height: GAMEPLAY_HEIGHT,
+    });
 
     this.guide = [];
     const scale = .05
@@ -912,24 +918,6 @@ export default class Application extends View {
         visible: false,
       });
     }
-
-    this.leftLine = new ImageView({
-      parent: this.playfield,
-      image: 'resources/images/game/objects/solid_white.png',
-      x: 0,
-      y: 0,
-      width: 4,
-      height: 1024,
-    });
-
-    this.rightLine = new ImageView({
-      parent: this.playfield,
-      image: 'resources/images/game/objects/solid_white.png',
-      x: 576 - 4,
-      y: 0,
-      width: 4,
-      height: 1024,
-    });
 
     this.header_arrow = new ImageView({
       parent: this.playfield,
@@ -955,7 +943,123 @@ export default class Application extends View {
       centerOnOrigin: true
     });
 
+    this.bowl = new ImageView({
+      parent: this.playfield,
+      image: 'resources/images/game/objects/bowl.png',
+      x: 576 / 2,
+      y: 970,
+      width: 300,
+      height: 187,
+    })
+    center(this.bowl, .5);
+
+    this.ball = [];
+    const d = BALL_DIAMETER * 1.3;
+    for (let i = 0; i < MAX_BALLS; i++) {
+      this.ball[i] = new ImageView({
+        parent: this.playfield,
+        image: 'resources/images/game/objects/heart.png',
+        x: 0,
+        y: 0,
+        width: d,
+        height: d,
+        visible: false,
+      });
+      center(this.ball[i], 1);
+    }
+
+    // heart counters
+    this.hearts = [];
+    for (let i = 0; i < MAX_BALLS; i++) {
+      let s = 1;
+      const t = i % 10;
+      if (t === 9) {
+        s = 1.25;
+      }
+      this.hearts[i] = new ImageView({
+        parent: this.playfield,
+        image: 'resources/images/game/objects/heart.png',
+        x: 40 + i * d / 3,
+        y: 70,
+        width: d,
+        height: d,
+        visible: false,
+      });
+      center(this.hearts[i], s * .75);
+    }
+
+    // score && high score
+    this.scoreDigits = [];
+    this.highScoreDigits = [];
+    for (let i = 0; i < 6; i++) {
+      this.scoreDigits[i] = new ImageView({
+        parent: this.playfield,
+        image: 'resources/fonts/digits/' + 0 + '.png',
+        x: 10 + i * 18,
+        y: 25,
+        width: 22,
+        height: 32,
+      });
+      this.highScoreDigits[i] = new ImageView({
+        parent: this.playfield,
+        image: 'resources/fonts/digits/' + 0 + '.png',
+        x: 10 + i * 18,
+        y: 55,
+        width: 22,
+        height: 32,
+      });
+    }
+
+    this.bowl_front = new ImageView({
+      parent: this.playfield,
+      image: 'resources/images/game/objects/bowl_front.png',
+      x: 576 / 2,
+      y: 970,
+      width: 300,
+      height: 187,
+    });
+    center(this.bowl_front, .5);
+
+    this.message = new ImageView({
+      parent: this.playfield,
+      image: "resources/images/game/text/LevelComplete.png",
+      x: 576 / 2,
+      y: 500,
+      width: 385,
+      height: 55,
+      visible: false,
+    });
+    center(this.message, 1);
+
+    this.collisionIndicators = [];
+    for (let i = 0; i < 4; i++) {
+      this.collisionIndicators[i] = new ImageView({
+        parent: this.playfield,
+        image: 'resources/images/game/objects/arrow_dot.png',
+        x: 0,
+        y: 0,
+        width: 256 * 0.025,
+        height: 256 * 0.025,
+        visible: SHOW_COLLISIONS,
+      });
+      center(this.collisionIndicators[i], 1);
+    }
+    this.normalIndicators = [];
+    for (let i = 0; i < 8; i++) {
+      this.normalIndicators[i] = new ImageView({
+        parent: this.playfield,
+        image: 'resources/images/game/objects/arrow_dot.png',
+        x: 0,
+        y: 0,
+        width: 256 * 0.025,
+        height: 256 * 0.025,
+        visible: SHOW_COLLISIONS,
+      });
+      center(this.normalIndicators[i], 1);
+    }
+
     sounds.playSong('game');
+    this.setupLevel(this.currentLevel);
   }
 }
 

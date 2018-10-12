@@ -1,7 +1,7 @@
 //todo grid the collisions for big speed boost
 
 import PachinkoCollider from './PachinkoCollider';
-import { rollFloat, sqrt } from './lib/MathHelpers';
+import { rollFloat, sqrt, clamp } from './lib/MathHelpers';
 import { GRAVITY, DRAG } from "./Game";
 import View from 'frontend/devkit-core/timestep/src/ui/View';
 
@@ -15,6 +15,7 @@ export default class PachinkoBall extends View {
   private gravityActive: boolean;
   public preCollision: boolean;
   private delay: number;
+  private type: string;
 
   constructor() {
     super({});
@@ -22,6 +23,14 @@ export default class PachinkoBall extends View {
     this.freezeFrame = false;
     this.active = false;
     this.preCollision = true;
+  }
+
+  setType(type: string) {
+    this.type = type;
+  }
+
+  getType(): string {
+    return this.type;
   }
 
   setPosition(x: number, y: number): void {
@@ -354,6 +363,19 @@ export default class PachinkoBall extends View {
       const d = 1 - DRAG;
       this.dx *= d;
       this.dy *= d;
+    }
+
+    const maxSpeed = 1;
+    const maxSpeedSquared = maxSpeed * maxSpeed;
+    if (this.type === 'rocket') {
+      this.dx *= 1.005;
+      this.dy *= 1.005;
+      const speedSquared = this.dx * this.dx + this.dy * this.dy;
+      if (speedSquared > maxSpeedSquared) {
+        const mult = sqrt(maxSpeed) / sqrt(speedSquared)
+        this.dx *= mult;
+        this.dy *= mult;
+      }
     }
   }
 }
