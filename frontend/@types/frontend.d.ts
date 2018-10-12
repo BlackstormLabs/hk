@@ -67,6 +67,7 @@ declare module "frontend/devkit-core/timestep/src/ui/ImageView" {
     import View from "frontend/devkit-core/timestep/src/ui/View";
 
     export default class ImageView extends View {
+      deltaX: number;
         constructor(opts: object);
         setImage(path: string, opts?: object): void;
         getImage(): any;
