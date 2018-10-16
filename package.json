@@ -1,5 +1,5 @@
 {
-  "name": "bgtest",
+  "name": "hk",
   "version": "0.0.1",
   "manifest": {
     "maxTick": 50,
@@ -24,7 +24,7 @@
         "preserveDrawingBuffer": false
       }
     },
-    "title": "bgtest",
+    "title": "hk",
     "fbinstant": {
       "url": "https://connect.facebook.net/en_US/fbinstant.6.1.js"
     }

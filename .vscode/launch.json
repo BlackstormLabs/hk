@@ -4,7 +4,7 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "Launch BG Demo",
+      "name": "Launch HK Demo",
       "url": "https://localhost:8020/webpack-dev-server/",
       "webRoot": "${workspaceFolder}",
       "sourceMaps": true,
